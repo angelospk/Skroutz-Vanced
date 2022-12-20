@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Skroutz Vanced",
+  "action": {},
+  "description": "Removes Sponsored Items from Search and Product Pages.",
+  "version": "0.0.1",
+  "icons": {},
+  "permissions": ["tabs", "scripting"],
+  "host_permissions": ["https://*.skroutz.gr/*"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
