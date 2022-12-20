@@ -7,7 +7,25 @@
   "icons": {},
   "permissions": ["tabs", "scripting"],
   "host_permissions": ["https://*.skroutz.gr/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.skroutz.gr/cart*"],
+      "js": ["cart.js"]
+    },
+  {
+    "matches": ["https://www.skroutz.gr/c/*"],
+    "js": ["search.js"] 
+  },
+  {
+    "matches": ["https://www.skroutz.gr/s/*"],
+    "js": ["product.js"] 
+  }],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "web_accessible_resources": [
+      {"resources":[
+      "images/*.png"],
+      "matches": ["https://*.skroutz.gr/*"]}
+    ]
   }
 }

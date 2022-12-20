@@ -1,4 +1,5 @@
 // Step 1: Select the element to be removed
+console.log("Hey");
 let elementToRemove = document.querySelector('.featured-product-card');
 //console.log(elementToRemove);
 // Step 2: Check if the element exists

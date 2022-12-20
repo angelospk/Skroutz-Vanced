@@ -1,4 +1,4 @@
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+/*chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' ) {
     if (tab.url.includes("/s/")){
       chrome.scripting.executeScript({
@@ -33,3 +33,4 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       
   }
 });
+*/
