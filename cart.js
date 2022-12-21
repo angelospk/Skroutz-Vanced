@@ -60,7 +60,6 @@ async function reload(){
     });
   }
   
-chrome.reload();
  /* let h1;
 if (typeof(h1)=="undefined"){
   h1=document.querySelector("#react-cart-page");}

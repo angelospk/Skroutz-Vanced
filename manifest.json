@@ -2,9 +2,8 @@
   "manifest_version": 2,
   "name": "Skroutz Vanced",
   "description": "Removes Sponsored Items and Adds Price Graphs.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "icons": {},
-  "permissions": ["tabs", "scripting"],
   "content_scripts": [
     {
       "matches": ["https://www.skroutz.gr/cart*"],
@@ -12,7 +11,7 @@
     },
   {
     "matches": ["https://www.skroutz.gr/c/*"],
-    "js": ["search.js","Chart.js","d3.v7.min.js"],
+    "js": ["Chart.js","d3.v7.min.js","search.js"],
     "type": "module"
   },
   {
@@ -20,16 +19,21 @@
     "js": ["product.js","Chart.js","d3.v7.min.js"],
     "type": "module"
   },{
-    "matches": ["https://www.skroutz.gr/prosfores*"],
-    "js": ["grafima.js","Chart.js","d3.v7.min.js"],
+    "matches": ["https://www.skroutz.gr/prosfor*"],
+    "js": ["Chart.js","d3.v7.min.js","grafima.js"],
+    "type": "module"
+  },{
+    "matches": ["https://www.skroutz.gr/shop*"],
+    "js": ["Chart.js","d3.v7.min.js","grafima.js"],
     "type": "module"
   },{
     "matches": ["https://www.skroutz.gr/plus-deals*"],
-    "js": ["grafima.js","Chart.js","d3.v7.min.js"],
+    "js": ["Chart.js","d3.v7.min.js","grafima.js"],
     "type": "module"
   }],
   "background": {
     "scripts": ["background.js"],
+    "pages": ["background.html"],
     "web_accessible_resources": [
       "images/*.png", "*.js"
     ]
