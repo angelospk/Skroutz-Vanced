@@ -35,9 +35,9 @@ async function reload(){
   
     // Set the src attribute of the img element to the desired image URL
     //let delurl=chrome.runtime.getURL("./images/delete.png");
-    //let delurl="https://fileswin.com/wp-content/uploads/2017/11/PC-Decrapifier-Logo.png";
-    img.innerHTML=`<img id="icon" src="./images/delete.png">`
-    //img.src=delurl;
+    let delurl="https://fileswin.com/wp-content/uploads/2017/11/PC-Decrapifier-Logo.png";
+    //img.innerHTML=`<img id="icon" src="./images/delete.png">`
+    img.src=delurl;
     img.setAttribute('height', "32");
     img.setAttribute('weight',"32");
   
@@ -46,7 +46,7 @@ async function reload(){
     button.setAttribute('type', 'button');
     // Set the onclick attribute of the button element to the desired function
     button.setAttribute('title', 'Άδεισμα ολόκληρου καλαθιού!');
-    button.style.marginLeft="15em";
+    button.style.marginLeft="25em";
     // Select the reference node
     var referenceNode = h1.firstChild;
   
@@ -60,7 +60,7 @@ async function reload(){
     });
   }
   
-
+chrome.reload();
  /* let h1;
 if (typeof(h1)=="undefined"){
   h1=document.querySelector("#react-cart-page");}

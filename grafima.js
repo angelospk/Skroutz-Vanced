@@ -1,30 +1,20 @@
-// Step 1: Select all elements to be removed
-let elementsToRemove = document.querySelectorAll('li span.label-text');
-if (elementsToRemove.length==0) elementsToRemove=document.querySelectorAll('label-text');
-
-// Step 2: Check if any elements were found
-if (elementsToRemove.length > 0) {
-  // Step 3: Iterate over all filtered elements and remove them one by one
-  for (let element of elementsToRemove) {
-    let parentElement = element.parentElement.parentElement.parentElement;
-    parentElement.remove();
-  }
-}
-
 /*
 const getSimpleStatisticsFromUnpkg = async () =>{ await import("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js");
 await import("https://d3js.org/d3.v7.min.js"); await import("https://cdn.anychart.com/releases/8.8.0/js/anychart-base.min.js");};
 
-const getpackages= getSimpleStatisticsFromUnpkg();
-
+const getpackages= getSimpleStatisticsFromUnpkg().then(x=>{console.log("tpt");})*/
+/*
 (async () => {
   const d3 = chrome.extension.getURL('d3.v7.min.js');
   const Chart = chrome.extension.getURL('Chart.js');
 })(); 
 import * as d3 from './d3.v7.min';
 import * as Chart from './Chart';*/
-
-let kin = document.querySelector("#sku-list").children;
+let li=document.querySelector("#sku-list");
+if (!li){
+    li=document.querySelector("#price_drops_index > main > section > ol");
+}
+let kin = li.children;
 //GIA STATISTIKA KANW LOAD TO D3 KAI GIA TO CHART TO MIN CHART
 // Loop through each product in the table
 for (let i = 0; i < kin.length; i++) {

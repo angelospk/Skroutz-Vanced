@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Skroutz Vanced",
   "action": {},
-  "description": "Removes Sponsored Items from Search and Product Pages.",
-  "version": "0.0.1",
+  "description": "Removes Sponsored Items and Adds Price Graphs.",
+  "version": "0.0.3",
   "icons": {},
   "permissions": ["tabs", "scripting"],
   "host_permissions": ["https://*.skroutz.gr/*"],
@@ -14,17 +14,27 @@
     },
   {
     "matches": ["https://www.skroutz.gr/c/*"],
-    "js": ["search.js"] 
+    "js": ["search.js","Chart.js","d3.v7.min.js"],
+    "type": "module"
   },
   {
     "matches": ["https://www.skroutz.gr/s/*"],
-    "js": ["product.js"] 
+    "js": ["product.js","Chart.js","d3.v7.min.js"],
+    "type": "module"
+  },{
+    "matches": ["https://www.skroutz.gr/prosfores*"],
+    "js": ["grafima.js","Chart.js","d3.v7.min.js"],
+    "type": "module"
+  },{
+    "matches": ["https://www.skroutz.gr/plus-deals*"],
+    "js": ["grafima.js","Chart.js","d3.v7.min.js"],
+    "type": "module"
   }],
   "background": {
     "service_worker": "background.js",
     "web_accessible_resources": [
       {"resources":[
-      "images/*.png"],
+      "images/*.png", "*.js"],
       "matches": ["https://*.skroutz.gr/*"]}
     ]
   }
