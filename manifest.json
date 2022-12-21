@@ -1,12 +1,10 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Skroutz Vanced",
-  "action": {},
   "description": "Removes Sponsored Items and Adds Price Graphs.",
   "version": "0.0.3",
   "icons": {},
   "permissions": ["tabs", "scripting"],
-  "host_permissions": ["https://*.skroutz.gr/*"],
   "content_scripts": [
     {
       "matches": ["https://www.skroutz.gr/cart*"],
@@ -31,11 +29,9 @@
     "type": "module"
   }],
   "background": {
-    "service_worker": "background.js",
+    "scripts": ["background.js"],
     "web_accessible_resources": [
-      {"resources":[
-      "images/*.png", "*.js"],
-      "matches": ["https://*.skroutz.gr/*"]}
+      "images/*.png", "*.js"
     ]
   }
 }
