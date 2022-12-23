@@ -10,32 +10,75 @@ const getpackages= getSimpleStatisticsFromUnpkg().then(x=>{console.log("tpt");})
 })(); 
 import * as d3 from './d3.v7.min';
 import * as Chart from './Chart';*/
+function isSpons(elem){
+  if (elem.querySelector("li span.label-text") || elem.querySelector("label-text"))  return true;
+  else return false;
+}
+function blurSp() {
+  // Step 1: Select all elements to be removed
+  let elementsToRemove = document.querySelectorAll("li span.label-text");
+  if (elementsToRemove.length == 0)
+    elementsToRemove = document.querySelectorAll("label-text");
+
+  // Step 2: Check if any elements were found
+  if (elementsToRemove.length > 0) {
+    // Step 3: Iterate over all filtered elements and remove them one by one
+    for (let element of elementsToRemove) {
+      let parentElement = element.parentElement.parentElement.parentElement;
+      //parentElement.remove();
+      parentElement.style.filter = "blur(5px)";
+      parentElement.style.opacity = "0.1";
+        parentElement.style.display="block";
+    }
+  }
+}
 
 var h1 = document.getElementsByClassName("page-title")[0];
 if (typeof button == "undefined") {
   addButton(h1);
   addSortButton(h1);
-  console.log("evala koumpi gia grafima kai gia sorting");
+  //console.log("evala koumpi gia grafima kai gia sorting");
 }
+const targetNode = getList();
+const observer = new MutationObserver((mutations) => {
+  // Iterate through the mutations and run your script for each mutation
+  //console.log("updated");
+  if (mutations.length > 10) {
+    blurSp();
+    getGraphs();
+  }
+  mutations.forEach((mutation) => {
+    // Run your script
+    //getGraphs();
+  });
+});
+
+// Configure the observer to watch for childList and attribute changes
+const config = { childList: true, attributes: true };
+
+// Start observing the target node for configured mutations
+observer.observe(targetNode, config);
+
 //var kin;
-let sorted=false;
+let elementStyle;
 //let percentages=[];
-let lista=[];
+let lista = [];
 //[lista, percentages]=getGraphs();
 getGraphs();
 //console.log(percentages.length,lista.length);
-function getList(){
+function getList() {
   try {
     li = document.querySelector("#sku-list");
     kin = li.children;
     //return document.querySelector("#sku-list").children;
-    return li
+    return li;
   } catch {
     //pairnw ti lista an eimai sti selida prosfores
     kin = document.getElementsByClassName("js-sku cf card ");
-    if (kin.length) {//return document.getElementsByClassName("js-sku cf card ");
-    return  kin[0].parentElement;}
-    else {
+    if (kin.length) {
+      //return document.getElementsByClassName("js-sku cf card ");
+      return kin[0].parentElement;
+    } else {
       //pairnw ti lista an eimai sti selida agapimena
       li = document.getElementsByClassName("js-favorites-list");
       if (li.length) {
@@ -51,9 +94,9 @@ function getList(){
 
 function getGraphs() {
   let kin = getList().children;
-  if (kin==null) return null;
+  if (kin == null) return null;
   //let pososta=[];
-
+  elementStyle=getComputedStyle(kin[0])
   //GIA STATISTIKA KANW LOAD TO D3 KAI GIA TO CHART TO MIN CHART
   // Loop through each product in the table
   for (let i = 0; i < kin.length; i++) {
@@ -61,6 +104,7 @@ function getGraphs() {
     if (kin[i].getElementsByTagName("canvas").length) {
       continue;
     }
+    if (isSpons(kin[i])) continue;
     
     let link;
     try {
@@ -70,7 +114,6 @@ function getGraphs() {
           link = link.replace(/.html.*/, "/price_graph.json");
           break;
         }
-        
       }
     } catch {
       continue;
@@ -125,7 +168,7 @@ function getGraphs() {
             gram.innerText += "+";
           }
           gram.innerText += pos.toString() + "%)";
-          if (pos>=-10) {
+          if (pos >= -10) {
             gram.style.color = "green";
           }
         } catch {
@@ -230,10 +273,13 @@ function getGraphs() {
         // Add the element to the DOM
         kin[i].appendChild(ctx);
         const chartContainer = kin[i].querySelector(".grafima");
-        if (pos!='undefined'){
+        if (pos != "undefined") {
           //percentages.push(pos);
           //lista.push(kin[i]);
-          lista.push({ element: kin[i], perc: pos });
+          if (!lista.some((item) => item.element === kin[i])) {
+            const elementCopy = kin[i].cloneNode(true);
+            lista.push({ element: elementCopy, perc: pos });
+          }
         }
       });
   }
@@ -241,7 +287,7 @@ function getGraphs() {
 }
 
 function sortElems() {
-  if (!lista.length || sorted == true) {
+  if (!lista.length) {
     return null;
   }
 
@@ -257,6 +303,7 @@ function sortElems() {
     }
   });
   // Remove the existing li elements from the sku-list element
+  /*
   let skuList = getList();
   while (skuList.firstChild) {
     skuList.removeChild(skuList.firstChild);
@@ -264,7 +311,7 @@ function sortElems() {
 
   // Add the sorted li elements to the sku-list element
   lista.forEach(obj => skuList.appendChild(obj.element));
-  /*
+  
   
   //percentages = lista.map(li => percentages[lista.indexOf(li)]);
   // Update the DOM with the sorted elements
@@ -280,10 +327,6 @@ function sortElems() {
   //return [skuList.children,percentages];
   */
 }
-  
-
-
-
 
 function addButton(h1) {
   // Create a new button element
@@ -295,7 +338,7 @@ function addButton(h1) {
   // Set the src attribute of the img element to the desired image URL
   //let delurl=chrome.runtime.getURL("./images/delete.png");
   let delurl =
-    "https://www.iconpacks.net/icons/1/free-chart-icon-646-thumb.png";
+    "https://www.clipartmax.com/png/middle/222-2221584_broom-clear-clean-tool-comments-clear-icon-png-blue.png";
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
   img.setAttribute("height", "32");
@@ -305,8 +348,8 @@ function addButton(h1) {
   button.appendChild(img);
   button.setAttribute("type", "button");
   // Set the onclick attribute of the button element to the desired function
-  button.setAttribute("title", "Φόρτωσε διαγράμματα ελάχιστης τιμής!");
-  button.style.marginLeft = "25em";
+  button.setAttribute("title", "Διέγραψε όλα τα αποθηκευμένα διαγράμματα ελάχιστης τιμής!");
+  button.style.marginLeft = "20em";
   // Select the reference node
   //var referenceNode = h1.firstChild;
 
@@ -314,8 +357,8 @@ function addButton(h1) {
   h1.appendChild(button);
 
   button.addEventListener("click", function () {
-    getGraphs();
-    console.log("new graphs added!");
+    lista=[];
+    //console.log("διαγράφτηκαν τα διαγράμματα!");
   });
 }
 
@@ -339,7 +382,10 @@ function addSortButton(h1) {
   button.appendChild(img);
   button.setAttribute("type", "button");
   // Set the onclick attribute of the button element to the desired function
-  button.setAttribute("title", "Ταξινόμησε ανάλογα με το ποσοστό απόκλισης από ιστορικό χαμηλό!");
+  button.setAttribute(
+    "title",
+    "Ταξινόμησε όλα τα προϊόντα που είδες ανάλογα με το ποσοστό απόκλισης από το ιστορικό χαμηλό!"
+  );
   button.style.marginLeft = "3em";
   // Select the reference node
   //var referenceNode = h1.firstChild;
@@ -348,7 +394,109 @@ function addSortButton(h1) {
   h1.appendChild(button);
 
   button.addEventListener("click", function () {
+    //sortElems();
+    //console.log("Sorted!");
+    // Create a new div element to hold the sorted elements
+
     sortElems();
-    console.log("Sorted!");
+    const popUpElement = document.createElement("div");
+
+    //const popUpElement = document.createElement('div');
+
+    // Set the innerHTML of the div element to the content of the pop-up
+    //popUpElement.innerHTML ="<p>Όσα προϊόντα είδες ταξινομημένα κάτα ποσοστό απόκλισης από ιστορικό χαμηλό!</p>";
+
+    // Set the styling of the pop-up element
+    popUpElement.style.position = "fixed";
+    popUpElement.style.top = "50%";
+    popUpElement.style.left = "50%";
+    popUpElement.style.transform = "translate(-50%, -50%)";
+    popUpElement.style.background = "white";
+    popUpElement.style.width = "90%";
+    popUpElement.style.height = "80%";
+    popUpElement.style.zIndex = "9999";
+    popUpElement.style.boxShadow = "20px 20px 30px #00000066";
+    popUpElement.style.borderRadius = "10px";
+    popUpElement.setAttribute("tabIndex", "0");
+    popUpElement.style.overflow = "scroll";
+    popUpElement.style.textAlign = "center";
+    popUpElement.style.padding = "20px";
+   
+    
+    const textlabel=document.createElement("div");
+    textlabel.innerHTML="<p><b>Όσα προϊόντα είδες ταξινομημένα κάτα ποσοστό απόκλισης από ιστορικό χαμηλό!</b></p>";
+    textlabel.style.color = "black";
+    textlabel.style.fontSize = "2.3em";
+    popUpElement.appendChild(textlabel);
+
+    const closeIconElement = document.createElement("img");
+    let delurl =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrM48tgSdjAHG3UrvzCzWdTKAdu3DqhOdUKg&usqp=CAU";
+    //img.innerHTML=`<img id="icon" src="./images/delete.png">`
+    closeIconElement.src = delurl;
+    closeIconElement.setAttribute("height", "32");
+    closeIconElement.setAttribute("weight", "32");
+    closeIconElement.style.position = 'fixed';
+closeIconElement.style.top = '20px';
+closeIconElement.style.right = '20px';
+    //closeIconElement.src = 'close-icon.png';
+
+    // Append the close icon element to the pop-up element
+    popUpElement.appendChild(closeIconElement);
+
+    const sorted=document.createElement("div")
+    
+    sorted.style.display = 'flex';
+    sorted.style.flexWrap = 'wrap';
+    
+    
+    popUpElement.appendChild(sorted);
+    // Append the pop-up element to the body
+    //document.body.appendChild(popUpElement);
+
+    //popUpElement.appendChild(lista[0].element);
+    //popUpElement.appendChild(lista[1].element);
+    // Append the pop-up element to the body
+    //popUpElement.style.display = 'flex';
+    //popUpElement.style.flexWrap = 'wrap';
+
+lista.forEach(obj => {
+  obj.element.style.cssText = elementStyle.cssText;
+  obj.element.style.flex = '0 2 10%';
+  obj.element.querySelector('img').style.maxWidth = '100%';
+  obj.element.querySelector('img').style.maxHeight = '100%';
+  //obj.element.style.maxWidth = '200px';
+  
+  obj.element.style.margin = '10px';
+  sorted.appendChild(obj.element);
+});
+
+    // Set the innerHTML of the div element to the sorted elements
+    //popUpElement.innerHTML = sortElems();
+    //popUpElement.innerText="hey testing";
+
+    // Create a close icon element
+    
+
+    document.body.appendChild(popUpElement);
+    // Add an event listener to the close icon element to handle the click event
+    closeIconElement.addEventListener("click", () => {
+      // Remove the pop-up element from the document
+      popUpElement.remove();
+    });
+
+    /*
+  document.body.addEventListener('click', event => {
+    if (event.target !== popUpElement && event.target !== closeIconElement) {
+      popUpElement.remove();
+    }
+  });
+
+  */
+
+    //console.log("Sorted!");
   });
 }
+
+// Later, you can stop observing the target node
+//observer.disconnect();
