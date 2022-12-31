@@ -6,30 +6,31 @@
   "version": "0.0.5",
   "icons": {},
   "host_permissions": ["https://*.skroutz.gr/*"],
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["https://www.skroutz.gr/cart*"],
       "js": ["cart.js"]
     },
   {
-    "matches": ["https://www.skroutz.gr/c/*"],
-    "js": ["search.js","Chart.js","d3.v7.min.js","grafima.js"],
+    "matches": ["https://www.skroutz.gr/c/*","https://www.skroutz.gr/search*"],
+    "js": ["teststart.js","search.js","Chart.js","d3.v7.min.js","grafima.js"],
     "type": "module"
   },
   {
     "matches": ["https://www.skroutz.gr/s/*"],
-    "js": ["product.js","Chart.js","d3.v7.min.js"],
+    "js": ["teststart.js","product.js","Chart.js","d3.v7.min.js"],
     "type": "module"
   },{
     "matches": ["https://www.skroutz.gr/prosfores*","https://www.skroutz.gr/account/*","https://www.skroutz.gr/plus-deals*","https://www.skroutz.gr/shop*","https://www.skroutz.gr/m.*"],
-    "js": ["grafima.js","Chart.js","d3.v7.min.js"],
+    "js": ["teststart.js","grafima.js","Chart.js","d3.v7.min.js"],
     "type": "module"
   }],
   "background": {
     "service_worker": "background.js",
     "web_accessible_resources": [
       {"resources":[
-      "images/*.png", "*.js"],
+      "images/deletecart.png", "*.js"],
       "matches": ["https://*.skroutz.gr/*"]}
     ]
   }

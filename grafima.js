@@ -35,6 +35,7 @@ function blurSp() {
 
 var h1 = document.getElementsByClassName("page-title")[0];
 if (typeof button == "undefined") {
+  addGraphButton(h1);
   addButton(h1);
   addSortButton(h1);
   //console.log("evala koumpi gia grafima kai gia sorting");
@@ -349,7 +350,7 @@ function addButton(h1) {
   button.setAttribute("type", "button");
   // Set the onclick attribute of the button element to the desired function
   button.setAttribute("title", "Διέγραψε όλα τα αποθηκευμένα διαγράμματα ελάχιστης τιμής!");
-  button.style.marginLeft = "20em";
+  button.style.marginLeft = "3em";
   // Select the reference node
   //var referenceNode = h1.firstChild;
 
@@ -361,6 +362,53 @@ function addButton(h1) {
     //console.log("διαγράφτηκαν τα διαγράμματα!");
   });
 }
+function addGraphButton(h1) {
+  // Create a new button element
+  var button = document.createElement("button");
+
+  // Create an img element
+  var img = document.createElement("img");
+
+  // Set the src attribute of the img element to the desired image URL
+  //let delurl=chrome.runtime.getURL("./images/delete.png");
+  let delurl =
+    "https://www.clipartmax.com/png/middle/222-2221584_broom-clear-clean-tool-comments-clear-icon-png-blue.png";
+  //img.innerHTML=`<img id="icon" src="./images/delete.png">`
+  img.src = delurl;
+  img.setAttribute("height", "32");
+  img.setAttribute("weight", "32");
+
+  // Append the img element to the button element
+  button.appendChild(img);
+  button.setAttribute("type", "button");
+  // Set the onclick attribute of the button element to the desired function
+  button.setAttribute("title", "Βγάλε διαγράμματα όπου βρεις!");
+  button.style.marginLeft = "20em";
+  // Select the reference node
+  //var referenceNode = h1.firstChild;
+
+  // Insert the button element before the reference node
+  h1.appendChild(button);
+
+  button.addEventListener("click", function () {
+    let nodes =getNodesGraphs(document.getElementsByTagName("li"));
+    for (let n of nodes){
+      let d=n.getElementsByTagName("span");
+      //pairnw to pososto se noumero
+      let pos=parseInt(d[d.length-1].textContent.replace("%)","").replace(/.*\(/,""));
+      if (pos != "undefined") {
+        //percentages.push(pos);
+        //lista.push(kin[i]);
+        if (!lista.some((item) => item.element === n)) {
+          const elementCopy = n.cloneNode(true);
+          lista.push({ element: elementCopy, perc: pos });
+        }
+      }
+    }
+    //console.log("διαγράφτηκαν τα διαγράμματα!");
+  });
+}
+
 
 function addSortButton(h1) {
   // Create a new button element

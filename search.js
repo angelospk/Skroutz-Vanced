@@ -13,7 +13,7 @@ function blurSp() {
       //parentElement.remove();
       parentElement.style.filter = "blur(5px)";
       parentElement.style.opacity = "0.1";
-        parentElement.style.display="block";
+        parentElement.style.display="none";
     }
   }
 }
