@@ -3,7 +3,7 @@
   "name": "Skroutz Vanced",
   "action": {},
   "description": "Removes Sponsored Items, Adds Price Graphs and Sorts Based on Product's Lowest Price.",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "icons": {},
   "host_permissions": ["https://*.skroutz.gr/*"],
   "permissions": ["storage"],
@@ -19,11 +19,11 @@
   },
   {
     "matches": ["https://www.skroutz.gr/s/*"],
-    "js": ["teststart.js","product.js","Chart.js","d3.v7.min.js"],
+    "js": ["teststart.js","product.js","Chart.js","d3.v7.min.js","grafima.js"],
     "type": "module"
   },{
     "matches": ["https://www.skroutz.gr/prosfores*","https://www.skroutz.gr/account/*","https://www.skroutz.gr/plus-deals*","https://www.skroutz.gr/shop*","https://www.skroutz.gr/m.*"],
-    "js": ["teststart.js","grafima.js","Chart.js","d3.v7.min.js"],
+    "js": ["teststart.js","Chart.js","d3.v7.min.js","grafima.js"],
     "type": "module"
   }],
   "background": {
