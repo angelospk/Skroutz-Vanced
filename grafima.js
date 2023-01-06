@@ -805,6 +805,42 @@ function showGraphs(nodes) {
   }
   graphsLoaded = true;
 }
+async function fetchData(url){
+let res = await fetch (url);
+let data=await res.json();
+return data;
+}
+async function fetchAllUrls(urls){
+  let promises=[];
+  for (let u of urls){
+    //fetch data for every url, put it it in the promises list
+    promises.push();
+  }
+  const results = await Promise.all(promises);
+  return results;
+}
+async function getSkus(url){
+  //let url; //vale to url tis selidas
+  url.replace(".html",".json")
+  data=await fetchData(url)
+  let skus=data.skus;
+  let ret=[];
+  for (let s of skus){
+    //AUTO THELEI ALLAGI
+    ret.push({price: s.price, title:s.title, url:s.url, skuid:s.sku_id})
+  }
+
+}
+async function getPageGraphs(){
+  let skus=await getSkus(document.baseURI)
+  let urls=skus.map(x=>x.url)
+  let graphsdata=await fetchAllUrls(urls);
+  //graphsdata.filter(x=>x!={})
+  for (let i=0; i<graphsdata.length; i++){
+    if (graphsdata[i]!={}) createGraphData(graphsdata[i],skus[i])
+  }
+
+}
 function getNextPageUrl(url) {
   //url=url.replace(/.html/)
   let next = "";
