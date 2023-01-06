@@ -899,29 +899,30 @@ async function fetchNextPage() {
   const results = await Promise.all(promises);
 }
 
-function createGraphData(a) {
+function createGraphData(data, a) {
   // if (product.getElementsByTagName("canvas").length) {
   //   return null;
   // }
   //if (isSpons(product)) continue;
-  let url = a.url;
+  //let url = a.url;
   let current_price = a.price;
 
-  let link = url;
+  //let link = url;
   var ret;
   let minEver;
-  return new Promise((resolve, reject) => {
-    // Load the data for the product
-    fetch(link)
-      .then((response) => response.json())
-      .then((data) => {
+  //return new Promise((resolve, reject) => {
+    // // Load the data for the product
+    // fetch(link)
+    //   .then((response) => response.json())
+    //   .then((data) => {
         // Extract the data for each time period
         //const minEver = data["min_price"]["min"];
         let timePeriods;
         try {
           timePeriods = Object.keys(data["min_price"]["graphData"]);
         } catch {
-          resolve(null);
+          //resolve(null);
+          return null;
         }
         timePeriods.reverse();
         const meanPrices = [];
@@ -1008,13 +1009,14 @@ function createGraphData(a) {
         };
         //console.log(ret);
         n[a.skuid] = ret;
-        resolve(ret);
-      })
-      .catch((error) => {
+        return true;
+      //   resolve(ret);
+      // })
+      /*.catch((error) => {
         // Reject the Promise with the error if there is one
         reject(error);
       });
-  });
+  });*/
 }
 let timePeriods = ["all", "6_months", "3_months", "1_months"];
 function setGreenColor(gram, pos){
