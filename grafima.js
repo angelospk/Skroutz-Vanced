@@ -50,6 +50,7 @@ function blurSp() {
     }
   }
 }
+let nowurl = document.baseURI;
 let n = JSON.parse(localStorage.getItem("graphs"));
 if (n == null) {
   n = {};
@@ -70,14 +71,22 @@ koumpia.style.marginLeft = "10em";
 koumpia.style.display = "flex";
 koumpia.style.alignItems = "flex-start";
 h1.appendChild(koumpia);
-let lists;
+let lists=findLists();
 let graphsLoaded = false;
 if (typeof button == "undefined") {
   addGraphButton(koumpia);
   addSortButton(koumpia);
-  computeSortedGraphs().then(() => {
+  if (!nowurl.includes(".html")){
+    nowurl+=".html"
+  }
+  getPageGraphs(nowurl).then(async () => {
+    computeSortedGraphs();
+    await getPageGraphs(getNextPageUrl(nowurl));
     console.log("fortwsa");
   });
+  // computeSortedGraphs().then(() => {
+  //   console.log("fortwsa");
+  // });
   //addButton(h1);
   //addSortButton(h1);
   //console.log("evala koumpi gia grafima kai gia sorting");
@@ -86,28 +95,36 @@ if (typeof button == "undefined") {
 // getNodesGraphs(document.body.getElementsByTagName("li")).then(
 //   console.log("run nodes func")
 // );
-async function computeSortedGraphs() {
+function computeSortedGraphs() {
   graphsLoaded = false;
   lists = findLists();
   for (let l of lists) {
-    if (settings.autoLoadGraphs) await getNodesGraphs(l.children);
-    if (settings.autoSortProducts) await sortPage();
+    if (settings.autoLoadGraphs) {
+      showGraphs(l.children);
+    }
+    //await getNodesGraphs(l.children);}
+    if (settings.autoSortProducts) sortPage();
   }
   //fetchNextPage()
-  await fetchNextPage();
+
   localStorage.setItem("graphs", JSON.stringify(n));
 }
 const targetNode = lists[0];
-let nowurl = document.baseURI;
+
 const observer = new MutationObserver(async (mutations) => {
   // Iterate through the mutations and run your script for each mutation
   //console.log("updated");
   if (mutations.some((x) => x.target.baseURI != nowurl)) {
     //console.log("namaste");
     nowurl = document.baseURI;
+    if (nowurl.includes("prosfores") && !nowurl.includes(".html")){
+      nowurl+=".html"
+    }
     console.log("nea selida");
     blurSp();
-    await computeSortedGraphs();
+    computeSortedGraphs();
+    getPageGraphs(getNextPageUrl(nowurl)).then(()=>{console.log("new page")})
+    
   }
   if (mutations.length > 10) {
     //console.log(mutations);
@@ -514,33 +531,36 @@ function addGraphButton(h1) {
   graphsbutton.appendChild(div);
 
   // Create an input element
-const input = document.createElement("input");
-input.type = "number";
-input.min = -50;
-input.max = 100;
-input.step=1;
-input.placeholder="-10"
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = -50;
+  input.max = 100;
+  input.step = 1;
+  input.placeholder = "-10";
 
-// Append the input element to the DOM
-div.appendChild(input);
+  // Append the input element to the DOM
+  div.appendChild(input);
 
-// Listen to the input event of the input element
-input.addEventListener("input", () => {
-  // Update the value of settings.limit with the value of the input element
-  console.log(input.value);
-  settings.limit = input.value;
-  localStorage.setItem("vanced-graph-settings", JSON.stringify(settings));
-  for (let p of lists[0].children){
-    let pd=getProductDetails(p);
-    try{if (p.querySelector(".grafima")){
-      let gram=Array.from(p.getElementsByTagName("span")).at(-1)
-      setGreenColor(gram, pd["pososto"])
-    }}
-    catch(err){ console.log("otan allaza xrwma sto:",pd);
-
+  // Listen to the input event of the input element
+  input.addEventListener("input", () => {
+    // Update the value of settings.limit with the value of the input element
+    console.log(input.value);
+    settings.limit = input.value;
+    localStorage.setItem("vanced-graph-settings", JSON.stringify(settings));
+    for (let p of lists[0].children) {
+      let pd = getProductDetails(p);
+      if (pd!=null){
+      try {
+        if (p.querySelector(".grafima")) {
+          let gram = Array.from(p.getElementsByTagName("span")).at(-1);
+          setGreenColor(gram, pd["pososto"]);
+        }
+      } catch (err) {
+        console.log("otan allaza xrwma sto:", pd);
+      }
+      }
     }
-  }
-});
+  });
 
   // Attach the mouseenter and mouseleave event listeners to the button element
   // h1.addEventListener("mouseenter", function () {
@@ -624,18 +644,19 @@ function addSortButton(h1) {
     await sortPage();
   });
 }
-async function sortPage() {
+function sortPage() {
   // TODO allakse to lists[0] sti megaliteri lista
   let skuList = lists[0];
-  if (!graphsLoaded) {
-    await getNodesGraphs(skuList.children);
-  }
+  // if (!graphsLoaded) {
+  //   await getNodesGraphs(skuList.children);
+  // }
   let lista = [];
   Array.from(skuList.children)
     .filter((x) => !isSpons(x))
     .forEach((x) => {
       let pd = getProductDetails(x);
       let perc;
+      if (pd!=null){
       try {
         perc = parseFloat(n[pd.skuid]["pososto"]);
       } catch (err) {
@@ -645,7 +666,7 @@ async function sortPage() {
       lista.push({
         elem: x,
         perc: perc,
-      });
+      });}
     });
   //let nulls=lista.filter(x=>x["perc"]==null).map(x=>x.elem)
   //lista=lista.filter(x=>x["perc"]!=null)
@@ -662,7 +683,7 @@ async function sortPage() {
     try {
       if (el.querySelector(".grafima")) continue;
       let a = getProductDetails(el);
-      createGraph(n[a.skuid], el, a.skuid, a.title, a.price);
+      if (a!=null){createGraph(n[a.skuid], el, a.skuid, a.title, a.price);}
     } catch (error) {
       console.log(error);
     }
@@ -805,41 +826,65 @@ function showGraphs(nodes) {
   }
   graphsLoaded = true;
 }
-async function fetchData(url){
-let res = await fetch (url);
-let data=await res.json();
-return data;
+async function fetchData(url) {
+  if (!url.includes(".json")){
+    url=url.replace("?",".json?")
+  }
+  let res = await fetch(url);
+  let data = await res.json();
+  return data;
 }
-async function fetchAllUrls(urls){
-  let promises=[];
-  for (let u of urls){
+async function fetchAllUrls(urls) {
+  let promises = [];
+  for (let u of urls) {
     //fetch data for every url, put it it in the promises list
-    promises.push();
+    promises.push(fetchData(u));
   }
   const results = await Promise.all(promises);
   return results;
 }
-async function getSkus(url){
+async function getSkus(url) {
   //let url; //vale to url tis selidas
-  url.replace(".html",".json")
-  data=await fetchData(url)
-  let skus=data.skus;
-  let ret=[];
-  for (let s of skus){
+  url = url.replace(".html", ".json");
+  let data = await fetchData(url);
+  let ret = [];
+  let skus = data.skus;
+  if (skus){
+  for (let i = 0; ; i++) {
     //AUTO THELEI ALLAGI
-    ret.push({price: s.price, title:s.title, url:s.url, skuid:s.sku_id})
+    if (i == skus.length) break;
+    let s = skus[i];
+    if (s.sku_url.includes("?from=featured")) {
+      skus.shift();
+      i--;
+    } else {
+      ret.push({
+        price: s.price,
+        title: s.name,
+        url: s.sku_url.replace(/.html.*/, "/price_graph.json"),
+        skuid: s.id,
+      });
+    }
+  }}
+  else{
+    //exoume html elements anti gia pinaka apo json
+    let test=document.createElement("div")
+    test.innerHTML=data.cards
+    let nds=Array.from(test.getElementsByTagName("li"))
+    ret=nds.map(x=>getProductDetails(x))
   }
-
+  return ret;
 }
-async function getPageGraphs(){
-  let skus=await getSkus(document.baseURI)
-  let urls=skus.map(x=>x.url)
-  let graphsdata=await fetchAllUrls(urls);
+async function getPageGraphs(pageurl) {
+  let skus = await getSkus(pageurl);
+  skus = skus.filter((x) => !n.hasOwnProperty(x.skuid.toString()));
+  let urls = skus.map((x) => x.url);
+  let graphsdata = await fetchAllUrls(urls);
   //graphsdata.filter(x=>x!={})
-  for (let i=0; i<graphsdata.length; i++){
-    if (graphsdata[i]!={}) createGraphData(graphsdata[i],skus[i])
+  for (let i = 0; i < graphsdata.length; i++) {
+    if (graphsdata[i] != {}) createGraphData(graphsdata[i], skus[i]);
   }
-
+  return skus;
 }
 function getNextPageUrl(url) {
   //url=url.replace(/.html/)
@@ -855,6 +900,16 @@ function getNextPageUrl(url) {
     next = url.replace(".html", ".html?page=2");
   }
   return next.replace(".html", ".json");
+}
+
+function nextPage(){
+  let a=new URLSearchParams(document.location.search)
+  let page=a.get("page")
+  if (page==null){page=1}
+  page++;
+  a.set("page", page)
+  let b=document.location.origin+document.location.pathname+"?"+a.toString()
+  return b.replace(".html", ".json");
 }
 async function fetchNextPage() {
   var skus = [];
@@ -911,116 +966,119 @@ function createGraphData(data, a) {
   var ret;
   let minEver;
   //return new Promise((resolve, reject) => {
-    // // Load the data for the product
-    // fetch(link)
-    //   .then((response) => response.json())
-    //   .then((data) => {
-        // Extract the data for each time period
-        //const minEver = data["min_price"]["min"];
-        let timePeriods;
-        try {
-          timePeriods = Object.keys(data["min_price"]["graphData"]);
-        } catch {
-          //resolve(null);
-          return null;
-        }
-        timePeriods.reverse();
-        const meanPrices = [];
-        const medianPrices = [];
-        const stdevPrices = [];
-        const minPrices = [];
-        const minStamps = [];
-        timePeriods.forEach((period) => {
-          const values = data["min_price"]["graphData"][period]["values"];
-          if (period == "1_months") {
-            values.pop();
-          }
-          const prices = values.map((v) => v["value"]).filter((p) => p !== 0.0);
-          //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
-          if (period == "1_months") {
-            for (let j = 1; j < prices.length; j++) {
-              if (prices.at(-j) == current_price) prices.pop();
-              else break;
-            }
-          }
-          // if (period!="all"){
-          //  prices.slice()
-          // }  let mtest=url.match(/\/s\/\d+\//);
-          let minpr;
-          if (prices.length == 0) {
-            minpr = null;
-            meanPrices.push(null);
-            medianPrices.push(null);
-            stdevPrices.push(null);
-            minPrices.push(minpr);
-            minStamps.push(null);
-          } else {
-            minpr = Math.min(...prices);
-            let minprelements = values
-              .filter((x) => x.value == minpr)
-              .map((x) => x.timestamp);
-            let tm = null;
-            if (minprelements.length > 0) {
-              tm = minprelements.at(-1);
-            }
-            //const imerominia=new Date(minprelements.at(-1).timestamp*1000).toDateString();
-            //const txt=`${minprelements.length} φορές. Τελευταία: ${imerominia}`
-            //console.log(prices);
-            let mean = parseFloat(d3.mean(prices).toFixed(2));
-            let median = parseFloat(d3.median(prices).toFixed(2))
-            let std;
-            try{std = parseFloat(d3.deviation(prices).toFixed(2))}
-            catch{std=null}
-            //console.log(mean, median, std)
-            meanPrices.push(mean);
-            medianPrices.push(median);
-            stdevPrices.push(std);
-            // meanPrices.push(d3.round(, 2));
-            // medianPrices.push(d3.round(, 2));
-            // stdevPrices.push(d3.round(, 2));
-            minPrices.push(minpr);
-            minStamps.push(tm);
-          }
-        });
-        //console.log({"mean":meanPrices,"median":medianPrices,"st": stdevPrices});
-        // Create a new element to hold the statistical measures
+  // // Load the data for the product
+  // fetch(link)
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  // Extract the data for each time period
+  //const minEver = data["min_price"]["min"];
+  let timePeriods;
+  try {
+    timePeriods = Object.keys(data["min_price"]["graphData"]);
+  } catch {
+    //resolve(null);
+    return null;
+  }
+  timePeriods.reverse();
+  const meanPrices = [];
+  const medianPrices = [];
+  const stdevPrices = [];
+  const minPrices = [];
+  const minStamps = [];
+  timePeriods.forEach((period) => {
+    const values = data["min_price"]["graphData"][period]["values"];
+    if (period == "1_months") {
+      values.pop();
+    }
+    const prices = values.map((v) => v["value"]).filter((p) => p !== 0.0);
+    //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
+    if (period == "1_months") {
+      for (let j = 1; j < prices.length; j++) {
+        if (prices.at(-j) == current_price) prices.pop();
+        else break;
+      }
+    }
+    // if (period!="all"){
+    //  prices.slice()
+    // }  let mtest=url.match(/\/s\/\d+\//);
+    let minpr;
+    if (prices.length == 0) {
+      minpr = null;
+      meanPrices.push(null);
+      medianPrices.push(null);
+      stdevPrices.push(null);
+      minPrices.push(minpr);
+      minStamps.push(null);
+    } else {
+      minpr = Math.min(...prices);
+      let minprelements = values
+        .filter((x) => x.value == minpr)
+        .map((x) => x.timestamp);
+      let tm = null;
+      if (minprelements.length > 0) {
+        tm = minprelements.at(-1);
+      }
+      //const imerominia=new Date(minprelements.at(-1).timestamp*1000).toDateString();
+      //const txt=`${minprelements.length} φορές. Τελευταία: ${imerominia}`
+      //console.log(prices);
+      let mean = parseFloat(d3.mean(prices).toFixed(2));
+      let median = parseFloat(d3.median(prices).toFixed(2));
+      let std;
+      try {
+        std = parseFloat(d3.deviation(prices).toFixed(2));
+      } catch {
+        std = null;
+      }
+      //console.log(mean, median, std)
+      meanPrices.push(mean);
+      medianPrices.push(median);
+      stdevPrices.push(std);
+      // meanPrices.push(d3.round(, 2));
+      // medianPrices.push(d3.round(, 2));
+      // stdevPrices.push(d3.round(, 2));
+      minPrices.push(minpr);
+      minStamps.push(tm);
+    }
+  });
+  //console.log({"mean":meanPrices,"median":medianPrices,"st": stdevPrices});
+  // Create a new element to hold the statistical measures
 
-        //let timi_el;
-        minEver = Math.min(...minPrices.filter((x) => x != null));
-        let minind = minPrices.indexOf(minEver);
-        let ltimestamp;
-        try {
-          ltimestamp = minStamps[minind];
-        } catch {
-          ltimestamp = 1;
-        }
-        // product.appendChild(gram);
-        let graphdata = {
-          mean: meanPrices,
-          median: medianPrices,
-          std: stdevPrices,
-          min: minPrices,
-        };
-        ret = {
-          graphdata: graphdata,
-          title: a.title,
-          minpr: minEver,
-          lastTimestamp: ltimestamp,
-        };
-        //console.log(ret);
-        n[a.skuid] = ret;
-        return true;
-      //   resolve(ret);
-      // })
-      /*.catch((error) => {
+  //let timi_el;
+  minEver = Math.min(...minPrices.filter((x) => x != null));
+  let minind = minPrices.indexOf(minEver);
+  let ltimestamp;
+  try {
+    ltimestamp = minStamps[minind];
+  } catch {
+    ltimestamp = 1;
+  }
+  // product.appendChild(gram);
+  let graphdata = {
+    mean: meanPrices,
+    median: medianPrices,
+    std: stdevPrices,
+    min: minPrices,
+  };
+  ret = {
+    graphdata: graphdata,
+    title: a.title,
+    minpr: minEver,
+    lastTimestamp: ltimestamp,
+  };
+  //console.log(ret);
+  n[a.skuid] = ret;
+  return true;
+  //   resolve(ret);
+  // })
+  /*.catch((error) => {
         // Reject the Promise with the error if there is one
         reject(error);
       });
   });*/
 }
 let timePeriods = ["all", "6_months", "3_months", "1_months"];
-function setGreenColor(gram, pos){
-  gram.style.color="black";
+function setGreenColor(gram, pos) {
+  gram.style.color = "black";
   if (pos != null && pos >= settings.limit) {
     gram.style.color = "green";
   }
@@ -1061,7 +1119,7 @@ function createGraph(obj, product, skuid, title, pr) {
     // gram.innerText = spantext;
     pos = parseFloat(pos);
     obj["pososto"] = pos;
-   setGreenColor(gram, pos);
+    setGreenColor(gram, pos);
     product.appendChild(gram);
   }
   // Insert the statistical measures into the element
