@@ -1,56 +1,15 @@
 // Create a style element
-const style = document.createElement("style");
+// const style = document.createElement("style");
 
-// Add the CSS rules as the text content of the style element
-style.innerHTML = `
-  .grafima{
-    display: none;
-    height: 500px;
-
-  }
-  .chart-popup{
-    display: none;
-    position: fixed;
-    top: 200px;
-    left: 100px;
-    width: 500px;
-    height: auto;
-    z-index: 10;
-    background-color: white;
-  }
-  .closing-icon{
-    position: absolute;
-    height: 32px;
-    width: 32px;
-    top: 0;
-    right: 0;
-  }
-  .koumpia{
-    top:0;
-    left:0;
-    margin-left: auto;
-  }
-`;
-let pop;
-let lastel;
-document.head.appendChild(style);
-let timePeriods = ["all", "6_months", "3_months", "1_months"];
+// // Add the CSS rules as the text content of the style element
+// style.innerHTML = `
+// input[type="checkbox"]:checked {
+//   background-image: url('https://icon-library.com/images/small-check-mark-icon/small-check-mark-icon-24.jpg'); /* path to the tick image */
+//   background-size: contain; /* resize the image to fit inside the checkbox */
+// }
+// `;
 
 let day = new Date().getDate();
-
-document.addEventListener("mousedown", function (e) {
-  if (e.target.hasAttribute("draggable")) {
-    let el = e.target;
-    let x = e.pageX;
-    let y = e.pageY;
-    document.addEventListener("mousemove", move);
-  }
-});
-
-function move(e) {
-  el.style.left = e.pageX - x + "px";
-  el.style.top = e.pageY - y + "px";
-}
 //let settings=JSON.parse(localStorage.getItem("vanced-graph-settings"));
 
 let settings = JSON.parse(localStorage.getItem("vanced-graph-settings"));
@@ -91,32 +50,43 @@ function blurSp() {
     }
   }
 }
+let nowurl = document.baseURI;
 let n = JSON.parse(localStorage.getItem("graphs"));
 if (n == null) {
   n = {};
   localStorage.setItem("graphs", JSON.stringify(n));
 }
+// if (
+//   Object.values(n)
+//     .map((x) => x.pr)
+//     .some((x) => Object.values(x).length == 0)
+// ) {
+//   n = {};
+//   localStorage.setItem("graphsElements", JSON.stringify(n));
+// }
 var h1 = document.getElementsByClassName("page-title")[0];
-if (typeof h1 == "undefined") {
-  h1 = document.querySelector("#site-header > div");
-}
 var koumpia = document.createElement("div");
-koumpia.className = "koumpia";
-koumpia.style.marginLeft = "3em";
+koumpia.style.marginLeft = "10em";
 //koumpia.style.maxWidth="25%"
-koumpia.style.display = "-webkit-inline-box";
-//koumpia.style.alignItems = "flex-start";
+koumpia.style.display = "flex";
+koumpia.style.alignItems = "flex-start";
 h1.appendChild(koumpia);
-let nowurl = document.baseURI;
-let lists;
+let lists=findLists();
 let graphsLoaded = false;
 if (typeof button == "undefined") {
   addGraphButton(koumpia);
   addSortButton(koumpia);
-  addDealsButton(koumpia);
-  computeSortedGraphs().then(() => {
+  if (!nowurl.includes(".html")){
+    nowurl+=".html"
+  }
+  getPageGraphs(nowurl).then(async () => {
+    computeSortedGraphs();
+    await getPageGraphs(getNextPageUrl(nowurl));
     console.log("fortwsa");
   });
+  // computeSortedGraphs().then(() => {
+  //   console.log("fortwsa");
+  // });
   //addButton(h1);
   //addSortButton(h1);
   //console.log("evala koumpi gia grafima kai gia sorting");
@@ -125,38 +95,38 @@ if (typeof button == "undefined") {
 // getNodesGraphs(document.body.getElementsByTagName("li")).then(
 //   console.log("run nodes func")
 // );
-async function computeSortedGraphs() {
+function computeSortedGraphs() {
   graphsLoaded = false;
   lists = findLists();
   for (let l of lists) {
-    l.style.alignItems = "flex-start";
-    if (settings.autoLoadGraphs) await getNodesGraphs(l.children);
-    if (settings.autoSortProducts) await sortPage();
+    if (settings.autoLoadGraphs) {
+      showGraphs(l.children);
+    }
+    //await getNodesGraphs(l.children);}
+    if (settings.autoSortProducts) sortPage();
   }
   //fetchNextPage()
-  if (!nowurl.includes("/s")) await fetchNextPage();
+
   localStorage.setItem("graphs", JSON.stringify(n));
 }
 const targetNode = lists[0];
+
 const observer = new MutationObserver(async (mutations) => {
   // Iterate through the mutations and run your script for each mutation
   //console.log("updated");
   if (mutations.some((x) => x.target.baseURI != nowurl)) {
     //console.log("namaste");
     nowurl = document.baseURI;
+    if (nowurl.includes("prosfores") && !nowurl.includes(".html")){
+      nowurl+=".html"
+    }
     console.log("nea selida");
     blurSp();
-    await computeSortedGraphs();
+    computeSortedGraphs();
+    getPageGraphs(getNextPageUrl(nowurl)).then(()=>{console.log("new page")})
+    
   }
-  if (
-    mutations.length > 10 &&
-    nowurl == "https://www.skroutz.gr/" &&
-    mutations.some(
-      (x) =>
-        x.target.className == "home-timeline-posts" && x.addedNodes.length > 5
-    )
-  ) {
-    await computeSortedGraphs();
+  if (mutations.length > 10) {
     //console.log(mutations);
     //await getNodesGraphs(document.body.getElementsByTagName("li"));
   }
@@ -503,36 +473,6 @@ function addButton(h1) {
     //console.log("διαγράφτηκαν τα διαγράμματα!");
   });
 }
-function addDealsButton(h1) {
-  let graphsbutton = document.createElement("div");
-  var button = document.createElement("button");
-
-  // Create an img element
-  var img = document.createElement("img");
-  let delurl = "https://img.icons8.com/ios-filled/512/low-price-euro.png";
-  //img.innerHTML=`<img id="icon" src="./images/delete.png">`
-  img.src = delurl;
-  img.setAttribute("height", "32");
-  img.setAttribute("weight", "32");
-
-  // Append the img element to the button element
-  button.appendChild(img);
-  button.setAttribute("type", "button");
-  // Set the onclick attribute of the button element to the desired function
-  button.setAttribute(
-    "title",
-    "(Beta) Τύπωσε στην κονσόλα τα καλύτερα deals από προϊόντα που είδες σήμερα !"
-  );
-  //graphsbutton.style.marginLeft = "20em";
-  // Select the reference node
-  //var referenceNode = h1.firstChild;
-  graphsbutton.appendChild(button);
-  // Insert the button element before the reference node
-  h1.appendChild(graphsbutton);
-  button.onclick = function () {
-    console.log(productDeals(30));
-  };
-}
 function addGraphButton(h1) {
   // Create a new button element
   let graphsbutton = document.createElement("div");
@@ -580,11 +520,9 @@ function addGraphButton(h1) {
   setting.innerHTML = `<input type="checkbox" style="-webkit-appearance: none;" id="autoloadgraphs" name="graphsload">
   <label for="autoloadgraphs"> Αυτόματη φόρτωση διαγραμμάτων</label><br>`;
   tickbox = setting.getElementsByTagName("input")[0];
-  tickbox.className = "my-checkbox";
   if (tickbox) {
     tickbox.checked = settings.autoLoadGraphs;
     tickbox.onclick = () => {
-      if (tickbox.checked) tickbox.style.backgroundColor = "#1c7ece";
       settings.autoLoadGraphs = change(settings.autoLoadGraphs);
       console.log("Changed", settings.autoLoadGraphs);
       localStorage.setItem("vanced-graph-settings", JSON.stringify(settings));
@@ -594,20 +532,14 @@ function addGraphButton(h1) {
 
   // Create an input element
   const input = document.createElement("input");
-  //input.style.right=0
-  input.display = "-webkit-box";
-  input.title =
-    "Όρισε το όριο όπου θα γίνεται πράσινο το ποσοστό ιστορικού χαμηλού!";
   input.type = "number";
-  input.height = "2em";
-  input.width = "3em";
   input.min = -50;
   input.max = 100;
   input.step = 1;
   input.placeholder = "-10";
 
   // Append the input element to the DOM
-  koumpia.appendChild(input);
+  div.appendChild(input);
 
   // Listen to the input event of the input element
   input.addEventListener("input", () => {
@@ -617,6 +549,7 @@ function addGraphButton(h1) {
     localStorage.setItem("vanced-graph-settings", JSON.stringify(settings));
     for (let p of lists[0].children) {
       let pd = getProductDetails(p);
+      if (pd!=null){
       try {
         if (p.querySelector(".grafima")) {
           let gram = Array.from(p.getElementsByTagName("span")).at(-1);
@@ -624,6 +557,7 @@ function addGraphButton(h1) {
         }
       } catch (err) {
         console.log("otan allaza xrwma sto:", pd);
+      }
       }
     }
   });
@@ -696,11 +630,9 @@ function addSortButton(h1) {
   setting.innerHTML = `<input type="checkbox" style="-webkit-appearance: none;" id="autoSortProducts" name="graphsload">
   <label for="autoSortProducts"> Αυτόματη ταξινόμηση προϊόντων</label><br>`;
   tickbox = setting.getElementsByTagName("input")[0];
-  tickbox.className = "my-checkbox";
   if (tickbox) {
     tickbox.checked = settings.autoSortProducts;
     tickbox.onclick = () => {
-      if (tickbox.checked) tickbox.style.backgroundColor = "#1c7ece";
       settings.autoSortProducts = change(settings.autoSortProducts);
       console.log("Changed", settings.autoSortProducts);
       localStorage.setItem("vanced-graph-settings", JSON.stringify(settings));
@@ -712,90 +644,82 @@ function addSortButton(h1) {
     await sortPage();
   });
 }
-async function sortPage() {
+function sortPage() {
   // TODO allakse to lists[0] sti megaliteri lista
-  //let skuList = lists[0];
-  for (skuList of lists) {
-    if (!graphsLoaded) {
-      await getNodesGraphs(skuList.children);
-    }
-    let lista = [];
-    Array.from(skuList.children)
-      .filter((x) => !isSpons(x))
-      .forEach((x) => {
-        let pd = getProductDetails(x);
-        let perc;
-        try {
-          perc = parseFloat(n[pd.skuid]["pososto"]);
-        } catch (err) {
-          console.log("sto pososto" + err);
-          perc = null;
-        }
-        lista.push({
-          elem: x,
-          perc: perc,
-        });
-      });
-    //let nulls=lista.filter(x=>x["perc"]==null).map(x=>x.elem)
-    //lista=lista.filter(x=>x["perc"]!=null)
-    lista.forEach((obj) => skuList.removeChild(obj.elem));
-    lista = sortElems(lista);
-
-    // while (skuList.firstChild) {
-    //   if (!isSpons(skuList.firstChild)) skuList.removeChild(skuList.firstChild);
-    // }
-
-    // Add the sorted li elements to the sku-list element
-    lista.forEach((obj) => skuList.appendChild(obj.elem));
-    for (let el of skuList.children) {
+  let skuList = lists[0];
+  // if (!graphsLoaded) {
+  //   await getNodesGraphs(skuList.children);
+  // }
+  let lista = [];
+  Array.from(skuList.children)
+    .filter((x) => !isSpons(x))
+    .forEach((x) => {
+      let pd = getProductDetails(x);
+      let perc;
+      if (pd!=null){
       try {
-        if (el.querySelector(".gram") || p.className.includes("-more-"))
-          continue;
-        let a = getProductDetails(el);
-        createGraph(n[a.skuid], el, a.skuid, a.title, a.price);
-      } catch (error) {
-        console.log(error);
+        perc = parseFloat(n[pd.skuid]["pososto"]);
+      } catch (err) {
+        console.log("sto pososto" + err);
+        perc = null;
       }
+      lista.push({
+        elem: x,
+        perc: perc,
+      });}
+    });
+  //let nulls=lista.filter(x=>x["perc"]==null).map(x=>x.elem)
+  //lista=lista.filter(x=>x["perc"]!=null)
+  lista.forEach((obj) => skuList.removeChild(obj.elem));
+  lista = sortElems(lista);
+
+  // while (skuList.firstChild) {
+  //   if (!isSpons(skuList.firstChild)) skuList.removeChild(skuList.firstChild);
+  // }
+
+  // Add the sorted li elements to the sku-list element
+  lista.forEach((obj) => skuList.appendChild(obj.elem));
+  for (let el of skuList.children) {
+    try {
+      if (el.querySelector(".grafima")) continue;
+      let a = getProductDetails(el);
+      if (a!=null){createGraph(n[a.skuid], el, a.skuid, a.title, a.price);}
+    } catch (error) {
+      console.log(error);
     }
   }
 }
-function changeElement(product, grafima) {
-  // Create the popup element
-  let popup = document.createElement("div");
-  popup.className = "chart-popup";
-  // popup.style.display = "none";
-  // popup.style.position = "fixed";
-  // popup.style.width="250px"
-  // popup.style.height="250px"
-  // popup.style.left = `100px`;
-  // popup.style.top ="100px";
+function changeElement(product) {
+  //product.appendChild(graph);
+  product.style.zIndex = "auto";
+  // product.style.width="243px"
+  // product.style.height="auto";
 
-  //product.parentElement.insert(popup);
-  let par = product.parentElement;
-  par.parentElement.insertBefore(popup, par);
-  //document.body.appendChild(popup);
+  let height = product.clientHeight;
+  console.log(height);
+  if (height <= 300) {
+    product.addEventListener("mouseenter", function () {
+      this.style.width = "150%";
+      this.style.height = "auto";
+      product.style.flexDirection = "column";
+      this.style.position = "static";
+      this.style.maxHeight = "420px";
+      this.style.zIndex = "10";
+      this.style.overflowX = "scroll";
+      this.style.overflowY = "hidden";
+      //this.style.pointerEvents = 'none';
+    });
 
-  // Move the "grafima" element to the popup
-  //let grafima = product.querySelector(".grafima");
-  // popup.appendChild(grafima);
-  //product.style.display="flex"
-  //grafima.style.flex="1"
-
-  // Set the height and top position of the popup based on the parent element
-  //let height = product.clientHeight;
-  // popup.style.height = height + "px";
-  // popup.style.top = product.offsetTop + height + "px";
-  //popup.style.left = `${product.left}px`;
-  //popup.style.top = `${product.bottom}px`;
-
-  product.addEventListener("mouseenter", function () {
-    popup.style.display = "block";
-  });
-
-  product.addEventListener("mouseleave", function () {
-    popup.style.display = "none";
-  });
-  return popup;
+    product.addEventListener("mouseleave", function () {
+      this.style.width = "100%";
+      this.style.height = "auto";
+      //this.style.overflow = 'hidden';
+      this.style.overflowX = "hidden";
+      this.style.position = "static";
+      this.style.zIndex = "auto";
+      //this.parentElement.style.pointerEvents = 'auto';
+    });
+  }
 }
 function findLists() {
   let possibles = [];
@@ -805,15 +729,10 @@ function findLists() {
   contposs = possibles.filter((x) => {
     str = x.className;
     return (
-      !str.includes("filter") &&
-      !str.includes("shadow") &&
-      !str.includes("users-reviews") &&
-      !str.includes("-nav-") &&
-      !str.includes("-actions") &&
-      str != ""
+      str.includes("list") && !str.includes("filter") && !str.includes("shadow")
     );
   });
-  //AN EIMAI STIN ARXIKH PREPEI NA VGALW TO INCLUDES "LIST" str.includes("list")
+  //AN EIMAI STIN ARXIKH PREPEI NA VGALW TO INCLUDES "LIST"
   if (contposs.length > 1) {
     contposs = contposs.filter((x) =>
       Array.from(x.children).some((x) =>
@@ -822,12 +741,6 @@ function findLists() {
         )
       )
     );
-  }
-  if (contposs.length > 1 && nowurl == "https://www.skroutz.gr/") {
-    let tags = contposs.map((x) => x.tagName);
-    if (tags.includes("UL") && tags.includes("OL")) {
-      contposs = contposs.filter((x) => x.tagName == "UL");
-    }
   }
 
   return contposs;
@@ -856,11 +769,7 @@ function getProductDetails(p) {
   let ind = l.indexOf(Math.max(...l));
   if (!t[ind].includes("€")) {
     title = t[ind];
-  } else {
-    title = decodeURI(
-      url.replace("/price_graph.json", "").replace(/^.+\/s\/\d+\//, "")
-    ).replaceAll("-", " ");
-  }
+  } else title = null;
   let pricetext = t.filter((x) => x.includes("€")).at(-1);
   if (!pricetext) price = null;
   else
@@ -882,7 +791,7 @@ function getProductDetails(p) {
 async function getNodesGraphs(nodes) {
   const promises = [];
   for (let p of nodes) {
-    if (p.querySelector(".gram")) continue;
+    if (p.querySelector("canvas")) continue;
     let pd = getProductDetails(p);
     if (pd == null || Object.values(pd).some((x) => x == null)) continue;
     if (
@@ -906,9 +815,9 @@ async function getNodesGraphs(nodes) {
 function showGraphs(nodes) {
   for (let p of nodes) {
     try {
-      if (!p.querySelector(".gram")) {
+      if (!p.querySelector(".grafima")) {
         let pd = getProductDetails(p);
-        if (pd != null && !p.className.includes("-more-"))
+        if (pd != null)
           createGraph(n[pd.skuid], p, pd.skuid, pd.title, pd.price);
       }
     } catch (err) {
@@ -916,6 +825,66 @@ function showGraphs(nodes) {
     }
   }
   graphsLoaded = true;
+}
+async function fetchData(url) {
+  if (!url.includes(".json")){
+    url=url.replace("?",".json?")
+  }
+  let res = await fetch(url);
+  let data = await res.json();
+  return data;
+}
+async function fetchAllUrls(urls) {
+  let promises = [];
+  for (let u of urls) {
+    //fetch data for every url, put it it in the promises list
+    promises.push(fetchData(u));
+  }
+  const results = await Promise.all(promises);
+  return results;
+}
+async function getSkus(url) {
+  //let url; //vale to url tis selidas
+  url = url.replace(".html", ".json");
+  let data = await fetchData(url);
+  let ret = [];
+  let skus = data.skus;
+  if (skus){
+  for (let i = 0; ; i++) {
+    //AUTO THELEI ALLAGI
+    if (i == skus.length) break;
+    let s = skus[i];
+    if (s.sku_url.includes("?from=featured")) {
+      skus.shift();
+      i--;
+    } else {
+      ret.push({
+        price: s.price,
+        title: s.name,
+        url: s.sku_url.replace(/.html.*/, "/price_graph.json"),
+        skuid: s.id,
+      });
+    }
+  }}
+  else{
+    //exoume html elements anti gia pinaka apo json
+    let test=document.createElement("div")
+    test.innerHTML=data.cards
+    let nds=Array.from(test.getElementsByTagName("li"))
+    ret=nds.map(x=>getProductDetails(x))
+  }
+  return ret;
+}
+async function getPageGraphs(pageurl) {
+  let skus = await getSkus(pageurl);
+  skus = skus.filter((x) => !n.hasOwnProperty(x.skuid.toString()));
+  let urls = skus.map((x) => x.url);
+  let graphsdata = await fetchAllUrls(urls);
+  //graphsdata.filter(x=>x!={})
+  for (let i = 0; i < graphsdata.length; i++) {
+    if (graphsdata[i] != {}) createGraphData(graphsdata[i], skus[i]);
+  }
+  return skus;
 }
 function getNextPageUrl(url) {
   //url=url.replace(/.html/)
@@ -932,20 +901,23 @@ function getNextPageUrl(url) {
   }
   return next.replace(".html", ".json");
 }
+
+function nextPage(){
+  let a=new URLSearchParams(document.location.search)
+  let page=a.get("page")
+  if (page==null){page=1}
+  page++;
+  a.set("page", page)
+  let b=document.location.origin+document.location.pathname+"?"+a.toString()
+  return b.replace(".html", ".json");
+}
 async function fetchNextPage() {
   var skus = [];
   pageUrl = getNextPageUrl(document.baseURI);
   if (pageUrl == "") return false;
   console.log(pageUrl);
-  let res;
-  let data;
-  try {
-    res = await fetch(pageUrl);
-    data = await res.json();
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
+  let res = await fetch(pageUrl);
+  let data = await res.json();
 
   // Check if there are skus items in the data
   if (data.skus && data.skus.length > 0) {
@@ -982,127 +954,129 @@ async function fetchNextPage() {
   const results = await Promise.all(promises);
 }
 
-function createGraphData(a) {
+function createGraphData(data, a) {
   // if (product.getElementsByTagName("canvas").length) {
   //   return null;
   // }
   //if (isSpons(product)) continue;
-  let url = a.url;
+  //let url = a.url;
   let current_price = a.price;
 
-  let link = url;
+  //let link = url;
   var ret;
   let minEver;
-  return new Promise((resolve, reject) => {
-    // Load the data for the product
-    fetch(link)
-      .then((response) => response.json())
-      .then((data) => {
-        // Extract the data for each time period
-        //const minEver = data["min_price"]["min"];
-        let timePeriods;
-        try {
-          timePeriods = Object.keys(data["min_price"]["graphData"]);
-        } catch {
-          resolve(null);
-        }
-        timePeriods.reverse();
-        const meanPrices = [];
-        const medianPrices = [];
-        const stdevPrices = [];
-        const minPrices = [];
-        const minStamps = [];
-        timePeriods.forEach((period) => {
-          const values = data["min_price"]["graphData"][period]["values"];
-          if (period == "1_months") {
-            values.pop();
-          }
-          const prices = values.map((v) => v["value"]).filter((p) => p !== 0.0);
-          //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
-          if (period == "1_months") {
-            for (let j = 1; j < prices.length; j++) {
-              if (prices.at(-j) == current_price) prices.pop();
-              else break;
-            }
-          }
-          // if (period!="all"){
-          //  prices.slice()
-          // }  let mtest=url.match(/\/s\/\d+\//);
-          let minpr;
-          if (prices.length == 0) {
-            minpr = null;
-            meanPrices.push(null);
-            medianPrices.push(null);
-            stdevPrices.push(null);
-            minPrices.push(minpr);
-            minStamps.push(null);
-          } else {
-            minpr = Math.min(...prices);
-            let minprelements = values
-              .filter((x) => x.value == minpr)
-              .map((x) => x.timestamp);
-            let tm = null;
-            if (minprelements.length > 0) {
-              tm = minprelements.at(-1);
-            }
-            //const imerominia=new Date(minprelements.at(-1).timestamp*1000).toDateString();
-            //const txt=`${minprelements.length} φορές. Τελευταία: ${imerominia}`
-            //console.log(prices);
-            let mean = parseFloat(d3.mean(prices).toFixed(2));
-            let median = parseFloat(d3.median(prices).toFixed(2));
-            let std;
-            try {
-              std = parseFloat(d3.deviation(prices).toFixed(2));
-            } catch {
-              std = null;
-            }
-            //console.log(mean, median, std)
-            meanPrices.push(mean);
-            medianPrices.push(median);
-            stdevPrices.push(std);
-            // meanPrices.push(d3.round(, 2));
-            // medianPrices.push(d3.round(, 2));
-            // stdevPrices.push(d3.round(, 2));
-            minPrices.push(minpr);
-            minStamps.push(tm);
-          }
-        });
-        //console.log({"mean":meanPrices,"median":medianPrices,"st": stdevPrices});
-        // Create a new element to hold the statistical measures
+  //return new Promise((resolve, reject) => {
+  // // Load the data for the product
+  // fetch(link)
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  // Extract the data for each time period
+  //const minEver = data["min_price"]["min"];
+  let timePeriods;
+  try {
+    timePeriods = Object.keys(data["min_price"]["graphData"]);
+  } catch {
+    //resolve(null);
+    return null;
+  }
+  timePeriods.reverse();
+  const meanPrices = [];
+  const medianPrices = [];
+  const stdevPrices = [];
+  const minPrices = [];
+  const minStamps = [];
+  timePeriods.forEach((period) => {
+    const values = data["min_price"]["graphData"][period]["values"];
+    if (period == "1_months") {
+      values.pop();
+    }
+    const prices = values.map((v) => v["value"]).filter((p) => p !== 0.0);
+    //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
+    if (period == "1_months") {
+      for (let j = 1; j < prices.length; j++) {
+        if (prices.at(-j) == current_price) prices.pop();
+        else break;
+      }
+    }
+    // if (period!="all"){
+    //  prices.slice()
+    // }  let mtest=url.match(/\/s\/\d+\//);
+    let minpr;
+    if (prices.length == 0) {
+      minpr = null;
+      meanPrices.push(null);
+      medianPrices.push(null);
+      stdevPrices.push(null);
+      minPrices.push(minpr);
+      minStamps.push(null);
+    } else {
+      minpr = Math.min(...prices);
+      let minprelements = values
+        .filter((x) => x.value == minpr)
+        .map((x) => x.timestamp);
+      let tm = null;
+      if (minprelements.length > 0) {
+        tm = minprelements.at(-1);
+      }
+      //const imerominia=new Date(minprelements.at(-1).timestamp*1000).toDateString();
+      //const txt=`${minprelements.length} φορές. Τελευταία: ${imerominia}`
+      //console.log(prices);
+      let mean = parseFloat(d3.mean(prices).toFixed(2));
+      let median = parseFloat(d3.median(prices).toFixed(2));
+      let std;
+      try {
+        std = parseFloat(d3.deviation(prices).toFixed(2));
+      } catch {
+        std = null;
+      }
+      //console.log(mean, median, std)
+      meanPrices.push(mean);
+      medianPrices.push(median);
+      stdevPrices.push(std);
+      // meanPrices.push(d3.round(, 2));
+      // medianPrices.push(d3.round(, 2));
+      // stdevPrices.push(d3.round(, 2));
+      minPrices.push(minpr);
+      minStamps.push(tm);
+    }
+  });
+  //console.log({"mean":meanPrices,"median":medianPrices,"st": stdevPrices});
+  // Create a new element to hold the statistical measures
 
-        //let timi_el;
-        minEver = Math.min(...minPrices.filter((x) => x != null));
-        let minind = minPrices.indexOf(minEver);
-        let ltimestamp;
-        try {
-          ltimestamp = minStamps[minind];
-        } catch {
-          ltimestamp = 1;
-        }
-        // product.appendChild(gram);
-        let graphdata = {
-          mean: meanPrices,
-          median: medianPrices,
-          std: stdevPrices,
-          min: minPrices,
-        };
-        ret = {
-          graphdata: graphdata,
-          title: a.title,
-          minpr: minEver,
-          lastTimestamp: ltimestamp,
-        };
-        //console.log(ret);
-        n[a.skuid] = ret;
-        resolve(ret);
-      })
-      .catch((error) => {
+  //let timi_el;
+  minEver = Math.min(...minPrices.filter((x) => x != null));
+  let minind = minPrices.indexOf(minEver);
+  let ltimestamp;
+  try {
+    ltimestamp = minStamps[minind];
+  } catch {
+    ltimestamp = 1;
+  }
+  // product.appendChild(gram);
+  let graphdata = {
+    mean: meanPrices,
+    median: medianPrices,
+    std: stdevPrices,
+    min: minPrices,
+  };
+  ret = {
+    graphdata: graphdata,
+    title: a.title,
+    minpr: minEver,
+    lastTimestamp: ltimestamp,
+  };
+  //console.log(ret);
+  n[a.skuid] = ret;
+  return true;
+  //   resolve(ret);
+  // })
+  /*.catch((error) => {
         // Reject the Promise with the error if there is one
         reject(error);
       });
-  });
+  });*/
 }
-
+let timePeriods = ["all", "6_months", "3_months", "1_months"];
 function setGreenColor(gram, pos) {
   gram.style.color = "black";
   if (pos != null && pos >= settings.limit) {
@@ -1127,7 +1101,6 @@ function createGraph(obj, product, skuid, title, pr) {
     minEver = Math.min(...minPrices.filter((x) => x != null));
   }
   let gram = document.createElement("span");
-  gram.className = "gram";
   if (minEver != 0) {
     gram.innerText = `ελάχιστο: ${minEver}`;
     let pos = null;
@@ -1150,63 +1123,8 @@ function createGraph(obj, product, skuid, title, pr) {
     product.appendChild(gram);
   }
   // Insert the statistical measures into the element
-  let highstd = meanPrices
-    .map((mean, i) => mean + stdevPrices[i])
-    .map((element) => {
-      if (element === 0) {
-        return null;
-      }
-      return element;
-    });
-  let lowstd = meanPrices
-    .map((mean, i) => mean - stdevPrices[i])
-    .map((element) => {
-      if (element === 0) {
-        return null;
-      }
-      return element;
-    });
   const ctx = document.createElement("canvas");
   ctx.className = "grafima";
-  if (product.clientHeight < 300 || product.clientWidth < 200) {
-    if (typeof pop == "undefined") {
-      pop = document.createElement("div");
-      pop.className = "chart-popup";
-      pop.setAttribute("draggable", "true");
-      let par = product.parentElement;
-      par.parentElement.insertBefore(pop, par);
-      let test = document.createElement("span");
-      test.innerText = "";
-      pop.appendChild(test);
-      let closeicon = document.createElement("img");
-      let closeiconurl =
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrM48tgSdjAHG3UrvzCzWdTKAdu3DqhOdUKg&usqp=CAU";
-      closeicon.src = closeiconurl;
-      closeicon.setAttribute("type", "button");
-      closeicon.className = "closing-icon";
-      closeicon.onmouseover = function () {
-        pop.style.display = "none";
-      };
-      pop.appendChild(closeicon);
-    }
-    //let popup=changeElement(product,ctx);
-    ctx.style.display = "none";
-    pop.appendChild(ctx);
-    product.addEventListener("mouseenter", function () {
-      if (lastel) lastel.style.display = "none";
-      pop.style.display = "block";
-      ctx.style.display = "block";
-      pop.querySelector("span").innerText = title;
-      lastel = ctx;
-    });
-
-    // product.addEventListener("mouseleave", function() {
-    //   pop.style.display="none";
-    //   ctx.style.display = "none";
-    // });
-    //product.style.display="flex"
-    //ctx.style.flex="1"
-  } else product.appendChild(ctx);
   const chart = new Chart(ctx, {
     type: "bar",
     data: {
@@ -1238,7 +1156,7 @@ function createGraph(obj, product, skuid, title, pr) {
         },
         {
           label: "Πάνω όριο τυπ. απόκλισης",
-          data: highstd,
+          data: meanPrices.map((mean, i) => mean + stdevPrices[i]),
           borderColor: "#000000",
           backgroundColor: "#000000",
           type: "line",
@@ -1250,7 +1168,7 @@ function createGraph(obj, product, skuid, title, pr) {
         },
         {
           label: "Κάτω όριο τυπ. απόκλισης",
-          data: lowstd,
+          data: meanPrices.map((mean, i) => mean - stdevPrices[i]),
           borderColor: "#000000",
           backgroundColor: "#000000",
           type: "line",
@@ -1284,7 +1202,7 @@ function createGraph(obj, product, skuid, title, pr) {
             position: "left",
             ticks: {
               beginAtZero: false,
-              suggestedMin: minEver,
+              suggestedMin: Math.min(...minPrices),
             },
           },
         ],
@@ -1292,42 +1210,18 @@ function createGraph(obj, product, skuid, title, pr) {
     },
   });
   // Add the element to the DOM
+  product.appendChild(ctx);
 
   //return ctx;
   //obj["chart"] = chart;
   //const chartContainer = product.querySelector(".grafima");
   return obj;
 }
-
-function productDeals(number) {
-  let today = Object.values(n)
-    .filter((x) => x.day == day)
-    .filter((x) => x.title != null);
-  today.sort((a, b) => {
-    // Compare the perc property
-    if (b.pososto == null) return -1;
-    else if (a.pososto == null) return 1;
-    if (a.pososto > b.pososto) {
-      return -1;
-    } else if (a.pososto < b.pososto) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
-  today = today.slice(0, number);
-  today.forEach((x) => {
-    delete x.graphdata;
-    delete x.day;
-    x.price = ((1 - x.pososto / 100) * x.minpr).toFixed(2);
-    x.lastTimeLow = new Date(x.lastTimestamp * 1000).toDateString().slice(4);
-    x.url =
-      "https://www.skroutz.gr/s/" +
-      x.skuid +
-      "/" +
-      x.title.replace(" ", "-") +
-      ".html";
-    delete x.lastTimestamp;
-  });
-  return today;
-}
+// if (pos != "undefined") {
+//   //percentages.push(pos);
+//   //lista.push(product);
+//   if (!lista.some((item) => item.element === product)) {
+//     const elementCopy = product.cloneNode(true);
+//     lista.push({ element: elementCopy, perc: pos });
+//   }
+// }

@@ -22,7 +22,7 @@
     "js": ["teststart.js","product.js","Chart.js","d3.v7.min.js","grafima.js"],
     "type": "module"
   },{
-    "matches": ["https://www.skroutz.gr/prosfores*","https://www.skroutz.gr/account/*","https://www.skroutz.gr/plus-deals*","https://www.skroutz.gr/shop*","https://www.skroutz.gr/m.*"],
+    "matches": ["https://www.skroutz.gr/prosfores*","https://www.skroutz.gr/account/*","https://www.skroutz.gr/plus-deals*","https://www.skroutz.gr/shop*","https://www.skroutz.gr/m.*","https://*.skroutz.gr/"],
     "js": ["teststart.js","Chart.js","d3.v7.min.js","grafima.js"],
     "type": "module"
   }],

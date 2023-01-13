@@ -167,6 +167,7 @@ async function fastGetItems() {
   return Object.values(it);
 }
 var cartsLoaded;
+var cartsObj=[];
 let items = [];
 const h1 = document.querySelector("#react-cart-page");
 if (typeof button == "undefined") {
@@ -227,7 +228,7 @@ function addWeightsButton(h1) {
   button.appendChild(img);
   button.setAttribute("type", "button");
   // Set the onclick attribute of the button element to the desired function
-  button.setAttribute("title", "Υπολόγισε τα πρόσθετα βάρη των προϊόντων!");
+  button.setAttribute("title", "(BETA) Υπολόγισε τα πρόσθετα βάρη των προϊόντων!");
   button.style.marginRight = "3em";
   // Select the reference node
   var referenceNode = h1.firstChild;
@@ -315,6 +316,18 @@ function addLoadButton(h1) {
   var referenceNode = h1.firstChild;
   getCarts(function (carts) {
     cartsLoaded = carts;
+    for (let i of cartsLoaded){
+      let minicart=[]
+      for (let j of i[2]){
+        minicart.push({sku_id:j[0],quantity:j[1],product_id:j[2]})
+      }
+      let cartObj={date:i[0], time:i[1], cart:minicart}
+      cartsObj.push(cartObj)
+    }
+    cartsObj.sort((a,b)=>{
+      if (a.date>b.date) return -1;
+      else return 1;
+    })
   });
   // Insert the button element before the reference node
   h1.insertBefore(button, referenceNode);
@@ -344,7 +357,8 @@ function addLoadButton(h1) {
     if (popup.style.display === "none") {
       popup.style.display = "block";
       // Loop through the array of carts
-      for (const cart of cartsLoaded.reverse()) {
+     
+      for (const cart of cartsObj) {
         // Create the container element for the cart
         // Add a class to style the container
 
@@ -355,7 +369,7 @@ function addLoadButton(h1) {
 
         // Create the smaller text element for the cart's date
         const cartDate = document.createElement("p");
-        cartDate.textContent = cart.date; // Set the text content to be the cart's date
+        cartDate.textContent = new Date(cart.date*1000).toLocaleString(); // Set the text content to be the cart's date
         cartDate.classList.add("cart-date"); // Add a class to style the text element
 
         // Create the delete icon element
@@ -363,7 +377,8 @@ function addLoadButton(h1) {
         deleteButton.textContent = "Delete"; // Set the text content to be "Load"
         deleteButton.classList.add("delete-savedcart-button"); // Add a class to style the button
         deleteButton.addEventListener("click", function () {
-          cartsLoaded = cartsLoaded.filter((item) => item != cart);
+          cartsObj = cartsObj.filter((item) => item != cart);
+          cartsLoaded=Array.from(cartsLoaded).filter(x=>x[0]!=cart.date)
           chrome.storage.sync.set({ Carts: cartsLoaded }, function () {
             console.log("Deleted cart from chrome.storage.sync");
           });
@@ -526,12 +541,16 @@ async function getCartData(pusheditems) {
   let cart = await reload();
   let proposals = cart.cart.proposals;
   count=0;
+  let done=false
   while (proposals.length == 0) {
     cart = await reload();
     console.log(cart.line_items);
     proposals = cart.cart.proposals;
     count++
-    if (count>=15) return null
+    setTimeout(async () => {
+      if (count>=15) {done=true}
+      if (done==true) return null;}, 100)
+    
   }
   let packages = proposals[0].packages;
   let shdata = proposals[0].summary.shipping_data_per_shop;
@@ -611,25 +630,35 @@ async function saveCart(name = "") {
   items = await getItems();
   //let c = await getItems();
   let smallitems=[];
+  let smallitemsobj=[];
   if (items.length == 0) {
     console.log("no items");
     return false;
   } else {
     for (let i of items){
-      smallitems.push({sku_id:i.sku_id,quanity: i.quantity,product_id: i.product_id})
+      smallitemsobj.push({sku_id:i.sku_id,quanity: i.quantity,product_id: i.product_id})
+      smallitems.push(i.sku_id,i.quantity,i.product_id)
     }
     let d = new Date();
-    if (name == "") {
-      name = d.toLocaleString();
-    }
-    let cartObj = {cart: smallitems, name: name }
+    // if (name == "") {
+    //   name = d.toLocaleString();
+    // }
+    //let cartObj = {cart: smallitems, name: name }
+    
     let timestamp=Math.round(d.getTime()/1000)
-    cartsLoaded.push(timestamp); // Add the new cart object to the array
+    let cartArr=[timestamp,name,smallitems]
+    cartsLoaded.push(cartArr); // Add the new cart object to the array
     
     // Save the updated Carts array to chrome.storage.sync
-    chrome.storage.sync.set({ Carts: cartsLoaded, timestamp:cartObj }, function () {
+    chrome.storage.sync.set({ Carts: cartsLoaded }, function () {
       console.log("Cart saved to chrome.storage.sync");
     });
+    let cartObj = {date: timestamp, name: name, cart: smallitemsobj}
+    cartsObj.push(cartObj)
+    cartsObj.sort((a,b)=>{
+      if (a.date>b.date) return -1;
+      else return 1;
+    })
     return true;
   }
 }
