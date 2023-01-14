@@ -163,7 +163,7 @@ if (typeof button == "undefined") {
   addDealsButton(koumpia);
   addScanButton(koumpia);
   computeSortedGraphs().then(() => {
-    console.log("fortwsa");
+    //console.log("fortwsa");
   });
   //addButton(h1);
   //addSortButton(h1);
@@ -174,18 +174,23 @@ if (typeof button == "undefined") {
 async function computeSortedGraphs() {
   graphsLoaded = false;
   lists = findLists();
+  graphPromises=[];
   for (let l of lists) {
     if (
-      Array.from(l.children).some(
-        (x) => x.clientHeight < 300 || x.clientWidth < 200
-      )
-    ) {
-      l.style.alignItems = "flex-start";
-    }
+          Array.from(l.children).some(
+            (x) => x.clientHeight < 300 || x.clientWidth < 200
+          )
+        ) {
+          l.style.alignItems = "flex-start";
+        }
     // if (settings.autoLoadGraphs) 
-    await getNodesGraphs(l.children);
-    if (settings.autoSortProducts) await sortPage();
+   //await getNodesGraphs(l.children)
+   graphPromises.push(getNodesGraphs(l.children));
+   //showGraphs(l.children)
   }
+  await Promise.all(graphPromises);
+  for (let l of lists) {showGraphs(l.children)}
+  if (settings.autoSortProducts) sortPage();
   //fetchNextPage()
   if (!nowurl.includes("/s")) {
     fetchNextPage().then(() => {
@@ -196,13 +201,34 @@ async function computeSortedGraphs() {
 const targetNode = lists[0];
 const observer = new MutationObserver(async (mutations) => {
   //console.log("updated");
-  if (mutations.some((x) => x.target.baseURI != nowurl)) {
-    //console.log("namaste");
-    nowurl = document.baseURI;
-    console.log("nea selida");
-    blurSp();
-    await computeSortedGraphs();
+  //console.log(mutations.filter(x=>x.addedNodes.length>0));
+// if (){
+  
+//   if (
+//     Array.from(l.children).some(
+//       (x) => x.clientHeight < 300 || x.clientWidth < 200
+//     )
+//   ) {
+//     l.style.alignItems = "flex-start";
+//   }
+// }
+  if (mutations.some(x=>x.addedNodes.length>0 && x.target.baseURI!=nowurl)){
+  try {blurSp()
+    await computeSortedGraphs()
+    nowurl=document.baseURI;
   }
+    catch (err){
+      console.error(err);
+    }
+
+  }
+  // if (mutations.some((x) => x.target.baseURI != nowurl)) {
+  //   //console.log("namaste");
+  //   nowurl = document.baseURI;
+  //   //console.log("nea selida");
+  //   blurSp();
+  //   await computeSortedGraphs();
+  // }
   if (
     mutations.length > 10 &&
     nowurl == "https://www.skroutz.gr/" &&
@@ -257,12 +283,12 @@ async function fetchData(url, retries = 0) {
   } catch (err) {
     if (retries < 5) {
       const delay = retryDelay(retries);
-      console.log(`Retrying ${url} in ${delay}ms, retry count: ${retries}`);
+      //console.log(`Retrying ${url} in ${delay}ms, retry count: ${retries}`);
       await new Promise(resolve => setTimeout(resolve, delay));
       data = await fetchData(url, retries + 1);
     } else {
-      console.log(`Failed to fetch ${url} after 5 retries`);
-      throw err;
+      //console.log(`Failed to fetch ${url} after 5 retries`);
+      //throw err;
     }}
   return data;}
 
@@ -320,7 +346,11 @@ function nextPage() {
 async function getSkus(url) {
   //let url; //vale to url tis selidas
   url = url.replace(".html", ".json");
-  let res = await fetch(url);
+  let res;
+  try{
+  res= await fetch(url);
+  }
+  catch{return null;}
   if (res.status != 200) return null;
   let data = await res.json();
 
@@ -1021,15 +1051,15 @@ function addSortButton(h1) {
   }
   sortbutton.appendChild(div);
 
-  button.addEventListener("click", async () => {
-    await sortPage();
+  button.addEventListener("click", () => {
+    sortPage();
   });
 }
-async function sortPage() {
+function sortPage() {
   for (skuList of lists) {
-    if (!graphsLoaded) {
-      await getNodesGraphs(skuList.children);
-    }
+    // if (!graphsLoaded) {
+    //   await getNodesGraphs(skuList.children);
+    // }
     let lista = [];
     Array.from(skuList.children)
       .filter((x) => !isSpons(x))
@@ -1039,7 +1069,7 @@ async function sortPage() {
         try {
           perc = parseFloat(n[pd.skuid]["pososto"]);
         } catch (err) {
-          console.log("sto pososto" + err);
+          //console.log("sto pososto" + err);
           perc = null;
         }
         lista.push({
@@ -1060,7 +1090,7 @@ async function sortPage() {
         let a = getProductDetails(el);
         createGraph(n[a.skuid], el, a.skuid, a.title, a.price);
       } catch (error) {
-        console.log(error);
+        //console.log(error);
       }
     }
   }
@@ -1115,7 +1145,7 @@ function findLists() {
       contposs = contposs.filter((x) => x.tagName == "UL");
     }
   }
-
+  if (contposs.length==1) return contposs
   return contposs.filter(x=>!x.querySelector(".gram"))
 
 }
@@ -1133,7 +1163,7 @@ function getProductDetails(p) {
   try {
     url = s.at(-1).href.replace(/\.html.*/, "/price_graph.json");
   } catch (err) {
-    console.log("sto link" + err);
+    //console.log("sto link" + err);
     return null;
   }
   let t = s.map((x) => x.textContent);
@@ -1158,7 +1188,7 @@ function getProductDetails(p) {
   try {
     skuid = parseInt(url.match(/\/s\/(\d+)\//)[1]);
   } catch (err) {
-    console.log(err);
+    //console.log(err);
     skuid = null;
   }
   return { price: price, title: title, url: url, skuid: skuid };
@@ -1189,8 +1219,10 @@ async function getNodesGraphs(nodes) {
 
   const results = await Promise.all(promises);
   //let filtered = results.filter((x) => !n.hasOwnProperty(x.skuid.toString()));
-  showGraphs(nodes);
   console.log(Object.values(n).length);
+  return results;
+  
+  
 }
 function showGraphs(nodes) {
   for (let p of nodes) {
@@ -1201,7 +1233,7 @@ function showGraphs(nodes) {
           createGraph(n[pd.skuid], p, pd.skuid, pd.title, pd.price);
       }
     } catch (err) {
-      console.log("error otan piga na tipwsw diagramma" + err);
+      //console.log("error otan piga na tipwsw diagramma" + err);
     }
   }
   graphsLoaded = true;
@@ -1212,9 +1244,9 @@ function getNextPageUrl(url) {
   c = url.match(/page\=(\d+)/);
   if (c) {
     let page = parseInt(c[1]);
-    console.log(`I am at page ${page}`);
+    //console.log(`I am at page ${page}`);
     page++;
-    console.log(`and I will fetch page ${page}`);
+    //console.log(`and I will fetch page ${page}`);
     next = url.replace(/\=\d+/, "=" + page.toString());
   } else {
     next = url.replace(".html", ".html?page=2");
