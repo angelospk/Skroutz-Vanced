@@ -175,6 +175,7 @@ if (typeof button == "undefined") {
   addWeightsButton(h1);
   addLoadButton(h1);
   addSaveButton(h1);
+  getCarts();
 }
 function addButton(h1) {
   // Create a new button element
@@ -314,21 +315,22 @@ function addLoadButton(h1) {
   button.style.marginRight="3em"
   // Select the reference node
   var referenceNode = h1.firstChild;
-  getCarts(function (carts) {
-    cartsLoaded = carts;
-    for (let i of cartsLoaded){
-      let minicart=[]
-      for (let j of i[2]){
-        minicart.push({sku_id:j[0],quantity:j[1],product_id:j[2]})
-      }
-      let cartObj={date:i[0], time:i[1], cart:minicart}
-      cartsObj.push(cartObj)
-    }
-    cartsObj.sort((a,b)=>{
-      if (a.date>b.date) return -1;
-      else return 1;
-    })
-  });
+  // getCarts(function (carts) {
+  //   cartsLoaded = carts;
+  //   for (let i of cartsLoaded){
+  //     let minicart=[]
+  //     for (let j of i[2]){
+  //       minicart.push({sku_id:j[0],quantity:j[1],product_id:j[2]})
+  //     }
+  //     let cartObj={date:i[0], time:i[1], cart:minicart}
+  //     cartsObj.push(cartObj)
+  //   }
+  //   cartsObj.sort((a,b)=>{
+  //     if (a.date>b.date) return -1;
+  //     else return 1;
+  //   })
+  // });
+  getCarts();
   // Insert the button element before the reference node
   h1.insertBefore(button, referenceNode);
   const popup = document.createElement("div");
@@ -663,10 +665,34 @@ async function saveCart(name = "") {
   }
 }
 
-function getCarts(callback) {
+Object.defineProperty(Array.prototype, 'chunk', {
+  value: function(chunkSize) {
+    var R = [];
+    for (var i = 0; i < this.length; i += chunkSize)
+      R.push(this.slice(i, i + chunkSize));
+    return R;
+  }
+});
+
+function getCarts() {
   chrome.storage.sync.get(["Carts"], function (items) {
     let carts = items.Carts || []; // Set to an empty array if it doesn't exist
-    callback(carts); // Call the callback function with the Carts array as the argument
+    cartsLoaded = carts;
+    cartsObj=[];
+    for (let i of cartsLoaded){
+      let minicart=[]
+      if (i[2].length>0 && typeof(i[2][0])!="object") i[2]=i[2].chunk(3);
+      for (let j of i[2]){
+        minicart.push({sku_id:j[0],quantity:j[1],product_id:j[2]})
+      }
+      let cartObj={date:i[0], name:i[1], cart:minicart}
+      cartsObj.push(cartObj)
+    }
+    cartsObj.sort((a,b)=>{
+      if (a.date>b.date) return -1;
+      else return 1;
+    })
+    //callback(carts); // Call the callback function with the Carts array as the argument
   });
 }
 

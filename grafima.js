@@ -1513,7 +1513,7 @@ for (let i = 0; i < graphsdata.length; i++) {
     lista.push(ret)};
 }
 console.clear();
-
+console.log(lista.length);
 lista=lista.filter(x=>x!=null).filter((x) => x.day == day)
 .filter((x) => x.title != null);
 skus.filter(x=>n.hasOwnProperty(x.skuid.toString()))
