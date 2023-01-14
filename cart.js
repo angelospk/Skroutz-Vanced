@@ -1,7 +1,5 @@
-// Create a style element
 const style = document.createElement("style");
 
-// Add the CSS rules as the text content of the style element
 style.innerHTML = `
   .loading-icon {
     position: absolute;
@@ -21,7 +19,6 @@ style.innerHTML = `
   }
 `;
 
-// Append the style element to the head of the document
 document.head.appendChild(style);
 let loading = false;
 async function reload() {
@@ -139,14 +136,7 @@ async function getItems() {
       p["category_id"] = it.category_id;
     }
   }
-  // for (let p of tes){
-  //   let skuid=p.sku_id
-  //   let it=Object.values(items).filter(x=>x.sku_id==skuid)[0];
-  //   let key=Object.keys(items).filter(x=>items[x]==it)[0];
-  //   p["id"]=parseInt(key);
-  //   p["product_id"]=it.product_id;
-  //   p["category_id"]=it.category_id;
-  // }
+
   for (let p of tes) {
     if (p.product_id == null) {
       // KALESE TO JSON TOU PROIONTOS
@@ -218,7 +208,6 @@ function addWeightsButton(h1) {
   var img = document.createElement("img");
 
   // Set the src attribute of the img element to the desired image URL
-  //let delurl=chrome.runtime.getURL("./images/delete.png");
   let delurl = "https://img.icons8.com/small/64/weight.png";
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
@@ -422,9 +411,7 @@ function addSaveButton(h1) {
   var img = document.createElement("img");
 
   // Set the src attribute of the img element to the desired image URL
-  //let delurl=chrome.runtime.getURL("./images/delete.png");
   let delurl = "https://img.icons8.com/small/64/save.png";
-  //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
   img.setAttribute("height", "32");
   img.setAttribute("weight", "32");
@@ -497,9 +484,7 @@ function addSaveButton(h1) {
     // Hide the popup element
     popup.style.display = "none";
 
-    // // Remove the text field and "Save" button
-    // popup.removeChild(inputField);
-    // popup.removeChild(saveButton);
+
   });
 }
 
@@ -509,18 +494,7 @@ let data= await res.json();
 return data.reviews.reviews;
 
 }
-  // let cartdata = [];
-  // function loadCartData() {
-  //   cartdata = [];
-  //   for (let i = 0; i < 5; i++) {
-  //     setTimeout(async () => {
-  //       let b = await getCartData();
-  //       if (!cartdata.includes(b)) {
-  //         cartdata.push(b);
-  //       }
-  //     }, 200);
-  //   }
-  // }
+
 function list2IncludesList1(itemslist1, itemslist2) {
   //elegxos gia sku id kai quantity
   //if (itemslist1.length != itemslist2.length) return false;
@@ -642,10 +616,7 @@ async function saveCart(name = "") {
       smallitems.push(i.sku_id,i.quantity,i.product_id)
     }
     let d = new Date();
-    // if (name == "") {
-    //   name = d.toLocaleString();
-    // }
-    //let cartObj = {cart: smallitems, name: name }
+
     
     let timestamp=Math.round(d.getTime()/1000)
     let cartArr=[timestamp,name,smallitems]
@@ -692,14 +663,6 @@ function getCarts() {
       if (a.date>b.date) return -1;
       else return 1;
     })
-    //callback(carts); // Call the callback function with the Carts array as the argument
   });
 }
 
-/* let h1;
-if (typeof(h1)=="undefined"){
-  h1=document.querySelector("#react-cart-page");}
-if (typeof(button)=="undefined") {addButton(h1)}
-//var h1 = document.querySelector('.page-title');
-// Create a new button element
-*/
