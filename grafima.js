@@ -12,10 +12,10 @@ style.innerHTML = `
     display: none;
     position: fixed;
     top: 200px;
-    left: 100px;
-    width: 500px;
+    left: 50px;
+    width: 400px;
     height: auto;
-    z-index: 10;
+    z-index: 50;
     background-color: white;
   }
   .closing-icon{
@@ -30,6 +30,16 @@ style.innerHTML = `
     left:0;
     margin-left: auto;
   }
+  .loading-icon {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    border-top-color: #333;
+    animation: spin 1s linear infinite;
+  }
 `;
 let pop;
 let lastel;
@@ -37,19 +47,49 @@ document.head.appendChild(style);
 let timePeriods = ["all", "6_months", "3_months", "1_months"];
 
 let day = new Date().getDate();
-
-document.addEventListener("mousedown", function (e) {
-  if (e.target.hasAttribute("draggable")) {
-    let el = e.target;
-    let x = e.pageX;
-    let y = e.pageY;
-    document.addEventListener("mousemove", move);
+//let day=14;
+let getPos=(minEver,pr)=>{
+  if (minEver==0) return null;
+  else return (((minEver - pr) / minEver) * 100).toFixed(2)};
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    /* if present, the header is where you move the DIV from:*/
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+    /* otherwise, move the DIV from anywhere inside the DIV:*/
+    elmnt.onmousedown = dragMouseDown;
   }
-});
 
-function move(e) {
-  el.style.left = e.pageX - x + "px";
-  el.style.top = e.pageY - y + "px";
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
 }
 //let settings=JSON.parse(localStorage.getItem("vanced-graph-settings"));
 
@@ -96,13 +136,24 @@ if (n == null) {
   n = {};
   localStorage.setItem("graphs", JSON.stringify(n));
 }
+function cleanNdict(){
+for (let key in n){
+  if (n[key].hasOwnProperty("url")) delete n[key].url
+  if (n[key].day!=day) delete n[key]
+}
+//   n=n.filter(x=>x.day!=day)
+// n.filter(x=>x.hasOwnProperty("url")).forEach(x=>delete x.url)
+localStorage.setItem("graphs", JSON.stringify(n));
+}
+
+cleanNdict();
 var h1 = document.getElementsByClassName("page-title")[0];
 if (typeof h1 == "undefined") {
   h1 = document.querySelector("#site-header > div");
 }
 var koumpia = document.createElement("div");
 koumpia.className = "koumpia";
-koumpia.style.marginLeft = "3em";
+koumpia.style.marginLeft = "1em";
 //koumpia.style.maxWidth="25%"
 koumpia.style.display = "-webkit-inline-box";
 //koumpia.style.alignItems = "flex-start";
@@ -114,6 +165,7 @@ if (typeof button == "undefined") {
   addGraphButton(koumpia);
   addSortButton(koumpia);
   addDealsButton(koumpia);
+  addScanButton(koumpia);
   computeSortedGraphs().then(() => {
     console.log("fortwsa");
   });
@@ -129,13 +181,23 @@ async function computeSortedGraphs() {
   graphsLoaded = false;
   lists = findLists();
   for (let l of lists) {
-    l.style.alignItems = "flex-start";
-    if (settings.autoLoadGraphs) await getNodesGraphs(l.children);
+    if (
+      Array.from(l.children).some(
+        (x) => x.clientHeight < 300 || x.clientWidth < 200
+      )
+    ) {
+      l.style.alignItems = "flex-start";
+    }
+    // if (settings.autoLoadGraphs) 
+    await getNodesGraphs(l.children);
     if (settings.autoSortProducts) await sortPage();
   }
   //fetchNextPage()
-  if (!nowurl.includes("/s")) await fetchNextPage();
-  localStorage.setItem("graphs", JSON.stringify(n));
+  if (!nowurl.includes("/s")) {
+    fetchNextPage().then(() => {
+      localStorage.setItem("graphs", JSON.stringify(n));
+    });
+  }
 }
 const targetNode = lists[0];
 const observer = new MutationObserver(async (mutations) => {
@@ -173,6 +235,313 @@ const config = { childList: true, attributes: true, subtree: true };
 
 // Start observing the target node for configured mutations
 observer.observe(document, config);
+const awaitTimeout = delay =>
+  new Promise(resolve => setTimeout(resolve, delay));
+
+async function oldfetchData(url) {
+  if (!url.includes(".json")) {
+    url = url.replace("?", ".json?");
+  }
+  let res;
+  let data;
+  try{
+   res = await fetch(url);
+   data = await res.json();}
+   catch(err){
+    await awaitTimeout(1000);
+    data= await fetchData(url);
+   }
+  return data;
+}
+
+const retryDelay = (retryCount) => {
+  return Math.pow(2, retryCount) * 100;
+}
+async function fetchData(url, retries = 0) {
+  if (!url.includes(".json")) {
+    url = url.replace("?", ".json?");
+  }
+  let res;
+  let data;
+  try{
+    res = await fetch(url, { timeout: 5000 });
+    data = await res.json();
+  } catch (err) {
+    if (retries < 5) {
+      const delay = retryDelay(retries);
+      console.log(`Retrying ${url} in ${delay}ms, retry count: ${retries}`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      data = await fetchData(url, retries + 1);
+    } else {
+      console.log(`Failed to fetch ${url} after 5 retries`);
+      throw err;
+    }}
+  return data;}
+
+async function fetchAllUrls(urls) {
+  let promises = [];
+  for (let u of urls) {
+    //fetch data for every url, put it it in the promises list
+    promises.push(fetchData(u));
+  }
+  const results = await Promise.all(promises);
+  return results;
+}
+async function fetchAllUrlsOld(urls) {
+  let results = [];
+  let retry = {};
+  const maxRetries = 5;
+  for (let url of urls) {
+    let response;
+    if (!retry[url]) {
+        retry[url] = 0;
+    }
+    while (response === undefined || response.status === 'rejected' && retry[url] < maxRetries) {
+        if (response && response.status === 'rejected') {
+            await new Promise(res => setTimeout(res, 300));
+            retry[url]++;
+        }
+        response = await fetchData(url);
+    }
+    if (response.status === 'fulfilled') {
+        results.push(response.value);
+    } else {
+        console.log(`Failed to fetch ${url} after ${maxRetries} retries`);
+    }
+  }
+  return results;
+}
+
+
+
+async function fetchAllUrlsoold(urls) {
+  let results = [];
+  let promises = urls.map(url => fetchData(url));
+  while (promises.length > 0) {
+    let response = await Promise.race(promises);
+    if (response.status === 'rejected') {
+        // retry fetching the rejected promise with a 200ms timeout
+        await new Promise(res => setTimeout(res, 200));
+        promises.push(fetchData(response.reason.url));
+    } else {
+        results.push(response.value);
+    }
+    promises = promises.filter(p => p !== response);
+  }
+  return results;
+}
+
+function nextPage() {
+  let a = new URLSearchParams(document.location.search);
+  let page = a.get("page");
+  if (page == null) {
+    page = 1;
+  }
+  page++;
+  a.set("page", page);
+  let b =
+    document.location.origin + document.location.pathname + "?" + a.toString();
+  if (!b.includes(".html")) {
+    b = b.replace("?", ".html?");
+  }
+  return b.replace(".html", ".json");
+}
+
+async function getSkus(url) {
+  //let url; //vale to url tis selidas
+  url = url.replace(".html", ".json");
+  let res = await fetch(url);
+  if (res.status != 200) return null;
+  let data = await res.json();
+
+  //let data = await fetchData(url);
+  let ret = [];
+  let skus = data.skus;
+  if (skus) {
+    for (let i = 0; ; i++) {
+      //AUTO THELEI ALLAGI
+      if (i == skus.length) break;
+      let s = skus[i];
+      if (s.sku_url.includes("?from=featured")) {
+        skus.shift();
+        i--;
+      } else {
+        ret.push({
+          price: s.price,
+          title: s.name,
+          url: s.sku_url.replace(/.html.*/, "/price_graph.json"),
+          skuid: s.id,
+        });
+      }
+    }
+  } else {
+    //exoume html elements anti gia pinaka apo json
+    let test = document.createElement("div");
+    test.innerHTML = data.cards;
+    let nds = Array.from(test.getElementsByTagName("li"));
+    ret = nds.map((x) => getProductDetails(x));
+  }
+  ret = ret.filter((x) => x != null);
+  return ret;
+}
+async function getPageGraphs(pageurl) {
+  let skus = await getSkus(pageurl);
+  if (skus == null || skus.length == 0) {
+    return null;
+  }
+  skus = skus.filter((x) => !hasRecentGraph(x.skuid, x.price));
+  let urls = skus.map((x) => x.url);
+  let graphsdata = await fetchAllUrls(urls);
+  //graphsdata.filter(x=>x!={})
+  for (let i = 0; i < graphsdata.length; i++) {
+    if (graphsdata[i] != {}) createGraphDataFromJSON(graphsdata[i], skus[i]);
+  }
+  return skus;
+}
+
+function createGraphDataFromJSON(data, a) {
+  // if (product.getElementsByTagName("canvas").length) {
+  //   return null;
+  // }
+  //if (isSpons(product)) continue;
+  //let url = a.url;
+  let pric=a.price;
+  //pairnw price ws string opote to metatrepw
+  let current_price;
+  try{
+    current_price= parseFloat(
+      pric
+        .match(/[\d,\.]+/)[0]
+        .replace(".", "")
+        .replace(",", ".")
+    );
+  }
+  catch (err){
+    return null;
+  }
+
+  //let link = url;
+  var ret;
+  let minEver;
+  //return new Promise((resolve, reject) => {
+  // // Load the data for the product
+  // fetch(link)
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  // Extract the data for each time period
+  //const minEver = data["min_price"]["min"];
+  let timePeriods;
+  try {
+    timePeriods = Object.keys(data["min_price"]["graphData"]);
+  } catch {
+    //resolve(null);
+    return null;
+  }
+  timePeriods.reverse();
+  const meanPrices = [];
+  const medianPrices = [];
+  const stdevPrices = [];
+  const minPrices = [];
+  const minStamps = [];
+  timePeriods.forEach((period) => {
+    const values = data["min_price"]["graphData"][period]["values"];
+
+    const prices = values.map((v) => v["value"]).filter((p) => p !== 0.0);
+    //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
+ 
+    // if (period!="all"){
+    //  prices.slice()
+    // }  let mtest=url.match(/\/s\/\d+\//);
+    let minpr=null;
+    let minprelements;
+    if (prices.length == 0) {
+      minpr = null;
+      meanPrices.push(null);
+      medianPrices.push(null);
+      stdevPrices.push(null);
+      minPrices.push(minpr);
+      minStamps.push(null);
+    } else {
+      if (period=="1_months"){
+        let clonepr=structuredClone(values).filter(v=>v["value"]!=0)
+        while (clonepr.at(-1) && clonepr.at(-1)["value"] == current_price) clonepr.pop();
+        
+        minpr=Math.min(...clonepr.map(x=>x["value"]))
+        minprelements = clonepr
+        .filter((x) => x.value == minpr)
+        .map((x) => x.timestamp);
+      }
+      else{ minpr = Math.min(...prices);
+      minprelements = values
+        .filter((x) => x.value == minpr)
+        .map((x) => x.timestamp);}
+      let tm = null;
+      if (minprelements.length > 0) {
+        tm = minprelements.at(-1);
+      }
+      //const imerominia=new Date(minprelements.at(-1).timestamp*1000).toDateString();
+      //const txt=`${minprelements.length} φορές. Τελευταία: ${imerominia}`
+      //console.log(prices);
+      let mean = parseFloat(d3.mean(prices).toFixed(2));
+      let median = parseFloat(d3.median(prices).toFixed(2));
+      let std;
+      try {
+        std = parseFloat(d3.deviation(prices).toFixed(2));
+      } catch {
+        std = null;
+      }
+      //console.log(mean, median, std)
+      meanPrices.push(mean);
+      medianPrices.push(median);
+      stdevPrices.push(std);
+      // meanPrices.push(d3.round(, 2));
+      // medianPrices.push(d3.round(, 2));
+      // stdevPrices.push(d3.round(, 2));
+      minPrices.push(minpr);
+      minStamps.push(tm);
+    }
+  });
+  //console.log({"mean":meanPrices,"median":medianPrices,"st": stdevPrices});
+  // Create a new element to hold the statistical measures
+
+  //let timi_el;
+  minEver = Math.min(...minPrices.filter((x) => x != null));
+  let pos=parseFloat(getPos(minEver, current_price))
+  let minind = minPrices.indexOf(minEver);
+  let ltimestamp;
+  try {
+    ltimestamp = minStamps[minind];
+  } catch {
+    ltimestamp = 1;
+  }
+  // product.appendChild(gram);
+  let graphdata = {
+    mean: meanPrices,
+    median: medianPrices,
+    std: stdevPrices,
+    min: minPrices,
+  };
+  ret = {
+    graphdata: graphdata,
+    title: a.title,
+    minpr: minEver,
+    lastTimestamp: ltimestamp,
+    day: day,
+    price: current_price,
+    pososto:pos,
+    id:a.skuid
+  };
+  //console.log(ret);
+  n[a.skuid] = ret;
+  return ret;
+  //   resolve(ret);
+  // })
+  /*.catch((error) => {
+        // Reject the Promise with the error if there is one
+        reject(error);
+      });
+  });*/
+}
 
 // let elementStyle;
 // let lista = [];
@@ -438,30 +807,6 @@ function sortElems(lista) {
     }
   });
   return lista;
-  // Remove the existing li elements from the sku-list element
-  /*
-  let skuList = getList();
-  while (skuList.firstChild) {
-    skuList.removeChild(skuList.firstChild);
-  }
-
-  // Add the sorted li elements to the sku-list element
-  lista.forEach(obj => skuList.appendChild(obj.element));
-  
-  
-  //percentages = lista.map(li => percentages[lista.indexOf(li)]);
-  // Update the DOM with the sorted elements
-  let skuList =getList();
-  while (skuList.firstChild) {
-    skuList.removeChild(skuList.firstChild);
-  }
-
-  // Add the sorted li elements to the sku-list element
-  lista.forEach(li => skuList.appendChild(li));
-  //sorted=true;
-  //getList().innerHTML = kin.map(li => li.outerHTML).join('');
-  //return [skuList.children,percentages];
-  */
 }
 function change(setting) {
   if (setting == true) return false;
@@ -480,8 +825,8 @@ function addButton(h1) {
     "https://www.clipartmax.com/png/middle/222-2221584_broom-clear-clean-tool-comments-clear-icon-png-blue.png";
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
-  img.setAttribute("height", "32");
-  img.setAttribute("weight", "32");
+  img.setAttribute("height", "24");
+  img.setAttribute("weight", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -494,7 +839,7 @@ function addButton(h1) {
   button.style.marginLeft = "3em";
   // Select the reference node
   //var referenceNode = h1.firstChild;
-
+  Promise(urls)
   // Insert the button element before the reference node
   h1.appendChild(button);
 
@@ -512,8 +857,8 @@ function addDealsButton(h1) {
   let delurl = "https://img.icons8.com/ios-filled/512/low-price-euro.png";
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
-  img.setAttribute("height", "32");
-  img.setAttribute("weight", "32");
+  img.setAttribute("height", "24");
+  img.setAttribute("weight", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -530,9 +875,56 @@ function addDealsButton(h1) {
   // Insert the button element before the reference node
   h1.appendChild(graphsbutton);
   button.onclick = function () {
-    console.log(productDeals(30));
+    console.log("PRODUCT DEALS ΣΗΜΕΡΑ:")
+    let d=productDeals(30);
+    for (let pr of d){
+      console.log(pr.url,pr)
+    }
+    // console.log();
   };
 }
+
+function addScanButton(h1) {
+  let graphsbutton = document.createElement("div");
+  var button = document.createElement("button");
+
+  // Create an img element
+  var img = document.createElement("img");
+  let delurl = "https://cdn.iconscout.com/icon/premium/png-32-thumb/search-document-1595247-1355010.png?f=avif";
+  //img.innerHTML=`<img id="icon" src="./images/delete.png">`
+  img.src = delurl;
+  img.setAttribute("height", "24");
+  img.setAttribute("weight", "24");
+
+  // Append the img element to the button element
+  button.appendChild(img);
+  button.style.marginLeft="1em"
+  button.setAttribute("type", "button");
+  // Set the onclick attribute of the button element to the desired function
+  button.setAttribute(
+    "title",
+    "(Beta) Σκάναρε όλες τις σελίδες και τύπωσε τα 50 καλύτερα deals!"
+  );
+  const loadingIcon = document.createElement("div");
+  loadingIcon.classList.add("loading-icon");
+  button.appendChild(loadingIcon);
+  loadingIcon.style.display="none";
+
+  //graphsbutton.style.marginLeft = "20em";
+  // Select the reference node
+  //var referenceNode = h1.firstChild;
+  graphsbutton.appendChild(button);
+  // Insert the button element before the reference node
+  h1.appendChild(graphsbutton);
+  button.onclick = async function () {
+    loadingIcon.style.display="block";
+    await fetchAllPagesStats().then(()=>{loadingIcon.style.display="none";
+    try{cleanNdict();}catch{let tpt=""}})
+    // console.log();
+  };
+}
+
+
 function addGraphButton(h1) {
   // Create a new button element
   let graphsbutton = document.createElement("div");
@@ -547,8 +939,8 @@ function addGraphButton(h1) {
     "https://www.iconpacks.net/icons/1/free-chart-icon-646-thumb.png";
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
-  img.setAttribute("height", "32");
-  img.setAttribute("weight", "32");
+  img.setAttribute("height", "24");
+  img.setAttribute("weight", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -671,8 +1063,8 @@ function addSortButton(h1) {
     "https://cdn.iconscout.com/icon/free/png-256/sort-1772385-1508281.png";
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
-  img.setAttribute("height", "32");
-  img.setAttribute("weight", "32");
+  img.setAttribute("height", "24");
+  img.setAttribute("weight", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -878,18 +1270,21 @@ function getProductDetails(p) {
   }
   return { price: price, title: title, url: url, skuid: skuid };
 }
-
+function hasRecentGraph(skuid, price=null){
+  if (n.hasOwnProperty(skuid.toString()) &&
+      n[skuid].hasOwnProperty("day") &&
+      n[skuid]["day"] == day &&
+      n[skuid]["price"]==price &&
+      Object.values(n[skuid]).every((x) => x != null)) return true
+  else return false;
+}
 async function getNodesGraphs(nodes) {
   const promises = [];
   for (let p of nodes) {
     if (p.querySelector(".gram")) continue;
     let pd = getProductDetails(p);
     if (pd == null || Object.values(pd).some((x) => x == null)) continue;
-    if (
-      n.hasOwnProperty(pd.skuid.toString()) &&
-      n[pd.skuid].hasOwnProperty("day") &&
-      n[pd.skuid]["day"] == day &&
-      Object.values(n[pd.skuid]).every((x) => x != null)
+    if (hasRecentGraph(pd.skuid, pd.price)
     ) {
       //return n[pd.skuid]
       //createGraph(n[pd.skuid], p, pd.skuid, pd.title, pd.price); //thelei allagi
@@ -933,53 +1328,10 @@ function getNextPageUrl(url) {
   return next.replace(".html", ".json");
 }
 async function fetchNextPage() {
-  var skus = [];
-  pageUrl = getNextPageUrl(document.baseURI);
-  if (pageUrl == "") return false;
-  console.log(pageUrl);
-  let res;
-  let data;
-  try {
-    res = await fetch(pageUrl);
-    data = await res.json();
-  } catch (err) {
-    console.log(err);
-    return false;
+  let nextp = nextPage();
+  if (!nextp.includes("/.json")) {
+    await getPageGraphs(nextp);
   }
-
-  // Check if there are skus items in the data
-  if (data.skus && data.skus.length > 0) {
-    // Add the skus items to the array
-    skus.push(...data.skus);
-  }
-  console.log(skus[0]);
-  let promises = [];
-  let nea = [];
-  for (let s of skus) {
-    let u =
-      "https://www.skroutz.gr" +
-      s.sku_url.replace(".html", "/price_graph.json");
-    let a = {
-      price: parseFloat(
-        s.price
-          .match(/[\d,\.]+/)[0]
-          .replace(".", "")
-          .replace(",", ".")
-      ),
-      title: s.name,
-      url: u,
-      skuid: s.id,
-    };
-    nea.push(a);
-    //console.log(a);
-    //
-  }
-  nea = nea.filter((x) => !n.hasOwnProperty(String(x.skuid)));
-  console.log(nea);
-  for (let item of nea) {
-    promises.push(createGraphData(item));
-  }
-  const results = await Promise.all(promises);
 }
 
 function createGraphData(a) {
@@ -1014,21 +1366,19 @@ function createGraphData(a) {
         const minStamps = [];
         timePeriods.forEach((period) => {
           const values = data["min_price"]["graphData"][period]["values"];
-          if (period == "1_months") {
-            values.pop();
-          }
+          // if (period == "1_months") {
+          //   values.pop();
+          // }
           const prices = values.map((v) => v["value"]).filter((p) => p !== 0.0);
           //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
-          if (period == "1_months") {
-            for (let j = 1; j < prices.length; j++) {
-              if (prices.at(-j) == current_price) prices.pop();
-              else break;
-            }
-          }
+          // if (period == "1_months") {
+            
+          // }
           // if (period!="all"){
           //  prices.slice()
           // }  let mtest=url.match(/\/s\/\d+\//);
-          let minpr;
+          let minpr=null;
+          let minprelements;
           if (prices.length == 0) {
             minpr = null;
             meanPrices.push(null);
@@ -1037,10 +1387,19 @@ function createGraphData(a) {
             minPrices.push(minpr);
             minStamps.push(null);
           } else {
-            minpr = Math.min(...prices);
-            let minprelements = values
+            if (period=="1_months"){
+              let clonepr=structuredClone(values).filter(v=>v["value"]!=0)
+              while (clonepr.at(-1) && clonepr.at(-1)["value"] == current_price) clonepr.pop();
+              
+              minpr=Math.min(...clonepr.map(x=>x["value"]))
+              minprelements = clonepr
               .filter((x) => x.value == minpr)
               .map((x) => x.timestamp);
+            }
+            else{ minpr = Math.min(...prices);
+            minprelements = values
+              .filter((x) => x.value == minpr)
+              .map((x) => x.timestamp);}
             let tm = null;
             if (minprelements.length > 0) {
               tm = minprelements.at(-1);
@@ -1072,6 +1431,7 @@ function createGraphData(a) {
 
         //let timi_el;
         minEver = Math.min(...minPrices.filter((x) => x != null));
+        let pos=parseFloat(getPos(minEver, current_price))
         let minind = minPrices.indexOf(minEver);
         let ltimestamp;
         try {
@@ -1091,6 +1451,10 @@ function createGraphData(a) {
           title: a.title,
           minpr: minEver,
           lastTimestamp: ltimestamp,
+          day:day,
+          price:current_price,
+          pososto:pos,
+          id:a.skuid
         };
         //console.log(ret);
         n[a.skuid] = ret;
@@ -1103,12 +1467,93 @@ function createGraphData(a) {
   });
 }
 
+async function fetchAllPagesStats(number=50){
+ let pages;
+ let te=document.getElementsByClassName("react-component paginator cf")
+ if (te.length>0){
+  let lp=Array.from(te[0].children).at(-2)
+  let m=lp.lastChild.href.match(/page\=(\d+)/)
+ if (m){
+  pages=parseInt(m[1])
+ }
+ else{
+  return null;
+ }
+ }
+ else return null;
+ 
+//  let chlen=lists.map(x=>x.childElementCount);
+//  let maxchcount=Math.max(...chlen);
+//  let l=lists.filter(x=>x.childElementCount==maxchcount)[0]
+let url_template=nextPage()
+let urls=[]
+for (let i=1; i<=pages; i++){
+urls.push(url_template.replace(/page\=\d+/,"page="+String(i)))
+}
+let promises=[];
+for (let u of urls){
+  promises.push(getSkus(u))
+}
+let skus=[];
+let pagesskus=await Promise.all(promises);
+for (let p of pagesskus){
+  skus.push(...p)
+}
+let b=location.hostname;
+let skus_nograph = skus.filter((x) => !hasRecentGraph(x.skuid, x.price));
+let skus_graph=skus.filter((x) => hasRecentGraph(x.skuid, x.price));
+urls=skus_nograph.map((x) => x.url);
+promises=[];
+let graphsdata = await fetchAllUrls(urls);
+let lista=skus_graph.map(x=>{let ret=n[x.skuid];ret["url"]=b+x.url.replace("/price_graph.json",".html");return ret;})
+for (let i = 0; i < graphsdata.length; i++) {
+  if (graphsdata[i] != {}) {let ret=createGraphDataFromJSON(graphsdata[i], skus_nograph[i]);
+    if (ret==null ) continue;
+    ret["url"]=b+skus_nograph[i].url.replace("/price_graph.json",".html");
+    lista.push(ret)};
+}
+console.clear();
+
+lista=lista.filter(x=>x!=null).filter((x) => x.day == day)
+.filter((x) => x.title != null);
+skus.filter(x=>n.hasOwnProperty(x.skuid.toString()))
+lista.sort((a, b) => {
+  // Compare the perc property
+  if (b.pososto == null) return -1;
+  else if (a.pososto == null) return 1;
+  if (a.pososto > b.pososto) {
+    return -1;
+  } else if (a.pososto < b.pososto) {
+    return 1;
+  } else {
+    return 0;
+  }
+});
+//TYPWSE
+console.log("TOP 50 DEALS ΑΠΟ ΠΡΟΙΟΝΤΑ ΟΛΩΝ ΤΩΝ ΣΕΛΙΔΩΝ:")
+let printlista = structuredClone(lista.slice(0, number));
+
+printlista.forEach((x) => {
+  delete x.graphdata;
+  delete x.day;
+  if (!x.hasOwnProperty("price")) x.price = ((1 - x.pososto / 100) * x.minpr).toFixed(2);
+  x.lastTimeLow = new Date(x.lastTimestamp * 1000).toDateString().slice(4);
+  delete x.lastTimestamp;
+  delete x.id;
+});
+for(let item of printlista){
+  console.log(item.url,item)
+}
+
+}
+
 function setGreenColor(gram, pos) {
   gram.style.color = "black";
   if (pos != null && pos >= settings.limit) {
     gram.style.color = "green";
   }
 }
+
 function createGraph(obj, product, skuid, title, pr) {
   if (obj == null) return null;
   let minEver;
@@ -1121,19 +1566,20 @@ function createGraph(obj, product, skuid, title, pr) {
   minEver = obj["minpr"];
   obj["day"] = day;
   obj["skuid"] = skuid;
-  obj["title"] = title;
+  //obj["title"] = title;
 
   if (typeof (minEver == "undefined") || minEver == 0) {
     minEver = Math.min(...minPrices.filter((x) => x != null));
   }
   let gram = document.createElement("span");
   gram.className = "gram";
+  let pos=obj["pososto"]
   if (minEver != 0) {
     gram.innerText = `ελάχιστο: ${minEver}`;
-    let pos = null;
+    //let pos = null;
     if (pr != null) {
       //yparxei to price kai dn einai null
-      pos = (((minEver - pr) / minEver) * 100).toFixed(2);
+      //pos = parseFloat(getPos(minEver,pr))
       gram.innerText += "  (";
       if (pos > 0) {
         gram.innerText += "+";
@@ -1145,7 +1591,7 @@ function createGraph(obj, product, skuid, title, pr) {
     }
     // gram.innerText = spantext;
     pos = parseFloat(pos);
-    obj["pososto"] = pos;
+    //obj["pososto"] = pos;
     setGreenColor(gram, pos);
     product.appendChild(gram);
   }
@@ -1168,45 +1614,47 @@ function createGraph(obj, product, skuid, title, pr) {
     });
   const ctx = document.createElement("canvas");
   ctx.className = "grafima";
-  if (product.clientHeight < 300 || product.clientWidth < 200) {
-    if (typeof pop == "undefined") {
-      pop = document.createElement("div");
-      pop.className = "chart-popup";
-      pop.setAttribute("draggable", "true");
-      let par = product.parentElement;
-      par.parentElement.insertBefore(pop, par);
-      let test = document.createElement("span");
-      test.innerText = "";
-      pop.appendChild(test);
-      let closeicon = document.createElement("img");
-      let closeiconurl =
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrM48tgSdjAHG3UrvzCzWdTKAdu3DqhOdUKg&usqp=CAU";
-      closeicon.src = closeiconurl;
-      closeicon.setAttribute("type", "button");
-      closeicon.className = "closing-icon";
-      closeicon.onmouseover = function () {
-        pop.style.display = "none";
-      };
-      pop.appendChild(closeicon);
-    }
-    //let popup=changeElement(product,ctx);
-    ctx.style.display = "none";
-    pop.appendChild(ctx);
-    product.addEventListener("mouseenter", function () {
-      if (lastel) lastel.style.display = "none";
-      pop.style.display = "block";
-      ctx.style.display = "block";
-      pop.querySelector("span").innerText = title;
-      lastel = ctx;
-    });
+  // if (product.clientHeight < 300 || product.clientWidth < 200) {
+  if (typeof pop == "undefined") {
+    pop = document.createElement("div");
+    pop.className = "chart-popup";
+    dragElement(pop);
+    pop.setAttribute("draggable", "true");
+    let par = product.parentElement;
+    par.parentElement.insertBefore(pop, par);
+    let test = document.createElement("span");
+    test.innerText = "";
+    pop.appendChild(test);
+    let closeicon = document.createElement("img");
+    let closeiconurl =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrM48tgSdjAHG3UrvzCzWdTKAdu3DqhOdUKg&usqp=CAU";
+    closeicon.src = closeiconurl;
+    closeicon.setAttribute("type", "button");
+    closeicon.className = "closing-icon";
+    closeicon.onmouseover = function () {
+      pop.style.display = "none";
+    };
+    pop.appendChild(closeicon);
+  }
+  //let popup=changeElement(product,ctx);
+  ctx.style.display = "none";
+  pop.appendChild(ctx);
+  product.addEventListener("mouseenter", function () {
+    if (settings.autoLoadGraphs){
+    if (lastel) lastel.style.display = "none";
+    pop.style.display = "block";
+    ctx.style.display = "block";
+    pop.querySelector("span").innerText = title;
+    lastel = ctx;
+}});
 
-    // product.addEventListener("mouseleave", function() {
-    //   pop.style.display="none";
-    //   ctx.style.display = "none";
-    // });
-    //product.style.display="flex"
-    //ctx.style.flex="1"
-  } else product.appendChild(ctx);
+  // product.addEventListener("mouseleave", function() {
+  //   pop.style.display="none";
+  //   ctx.style.display = "none";
+  // });
+  //product.style.display="flex"
+  //ctx.style.flex="1"
+  // } else product.appendChild(ctx);
   const chart = new Chart(ctx, {
     type: "bar",
     data: {
@@ -1299,15 +1747,26 @@ function createGraph(obj, product, skuid, title, pr) {
   return obj;
 }
 
-function productDeals(number) {
-  let today = Object.values(n)
+function productDeals(number=50) {
+  let today = structuredClone(Object.values(n))
     .filter((x) => x.day == day)
     .filter((x) => x.title != null);
   today.sort((a, b) => {
     // Compare the perc property
     if (b.pososto == null) return -1;
-    else if (a.pososto == null) return 1;
-    if (a.pososto > b.pososto) {
+    else if (a.pososto == null) return 1;((a, b) => {
+      // Compare the perc property
+      if (b.pososto == null) return -1;
+      else if (a.pososto == null) return 1;
+      if (a.pososto > b.pososto) {
+        return -1;
+      } else if (a.pososto < b.pososto) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    if (a.pososto > b.pososto) {  
       return -1;
     } else if (a.pososto < b.pososto) {
       return 1;
@@ -1319,13 +1778,13 @@ function productDeals(number) {
   today.forEach((x) => {
     delete x.graphdata;
     delete x.day;
-    x.price = ((1 - x.pososto / 100) * x.minpr).toFixed(2);
+    if (!x.hasOwnProperty("price")) x.price = ((1 - x.pososto / 100) * x.minpr).toFixed(2);
     x.lastTimeLow = new Date(x.lastTimestamp * 1000).toDateString().slice(4);
     x.url =
       "https://www.skroutz.gr/s/" +
-      x.skuid +
+      x.id +
       "/" +
-      x.title.replace(" ", "-") +
+      x.title.replaceAll(/[\s\/\(\)\"\.]+/gm,"-").replace(/\-$/,"") +
       ".html";
     delete x.lastTimestamp;
   });
