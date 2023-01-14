@@ -166,7 +166,7 @@ async function fastGetItems() {
   }
   return Object.values(it);
 }
-var cartsLoaded;
+var cartsLoaded=[];
 var cartsObj=[];
 let items = [];
 const h1 = document.querySelector("#react-cart-page");
@@ -175,6 +175,21 @@ if (typeof button == "undefined") {
   addWeightsButton(h1);
   addLoadButton(h1);
   addSaveButton(h1);
+  getCarts(function (carts) {
+    cartsLoaded = carts;
+    for (let i of cartsLoaded){
+      let minicart=[]
+      for (let j of i[2]){
+        minicart.push({sku_id:j[0],quantity:j[1],product_id:j[2]})
+      }
+      let cartObj={date:i[0], time:i[1], cart:minicart}
+      cartsObj.push(cartObj)
+    }
+    cartsObj.sort((a,b)=>{
+      if (a.date>b.date) return -1;
+      else return 1;
+    })
+  });
 }
 function addButton(h1) {
   // Create a new button element

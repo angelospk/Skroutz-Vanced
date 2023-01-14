@@ -264,7 +264,7 @@ async function fetchData(url, retries = 0) {
   let res;
   let data;
   try{
-    res = await fetch(url, { timeout: 5000 });
+    res = await fetch(url, { timeout: 20000 });
     data = await res.json();
   } catch (err) {
     if (retries < 5) {
@@ -369,7 +369,7 @@ async function getSkus(url) {
         ret.push({
           price: s.price,
           title: s.name,
-          url: s.sku_url.replace(/.html.*/, "/price_graph.json"),
+          url: location.hostname+s.sku_url.replace(/.html.*/, "/price_graph.json"),
           skuid: s.id,
         });
       }
