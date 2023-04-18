@@ -43,6 +43,7 @@ style.innerHTML = `
 `;
 let pop;
 let lastel;
+let nodes=[];
 document.head.appendChild(style);
 let timePeriods = ["all", "6_months", "3_months", "1_months"];
 
@@ -162,6 +163,7 @@ if (typeof button == "undefined") {
   addSortButton(koumpia);
   addDealsButton(koumpia);
   addScanButton(koumpia);
+  addFilterButton(koumpia);
   computeSortedGraphs().then(() => {
     //console.log("fortwsa");
   });
@@ -175,6 +177,7 @@ async function computeSortedGraphs() {
   graphsLoaded = false;
   lists = findLists();
   graphPromises=[];
+  nodes=[];
   for (let l of lists) {
     if (
           Array.from(l.children).some(
@@ -185,6 +188,7 @@ async function computeSortedGraphs() {
         }
     // if (settings.autoLoadGraphs) 
    //await getNodesGraphs(l.children)
+  nodes.push(...l.children)
    graphPromises.push(getNodesGraphs(l.children));
    //showGraphs(l.children)
   }
@@ -903,6 +907,65 @@ function addScanButton(h1) {
     try{cleanNdict();}catch{let tpt=""}})
     // console.log();
   };
+}
+function addFilterButton(h1) {
+  // Create a new button element
+  var button = document.createElement("button");
+
+  // Create an img element
+  var img = document.createElement("img");
+
+  // Set the src attribute of the img element to the desired image URL
+  let filterUrl =
+    "https://icon-library.com/images/distance-icon/distance-icon-6.jpg";
+  img.src = filterUrl;
+  img.setAttribute("height", "24");
+  img.setAttribute("weight", "24");
+
+  // Append the img element to the button element
+  button.appendChild(img);
+  button.setAttribute("type", "button");
+  // Set the onclick attribute of the button element to the desired function
+  button.setAttribute(
+    "title",
+    "Φιλτράρισμα των διαθέσιμων προϊόντων σε κοντινό κατάστημα!"
+  );
+  button.style.marginLeft = "3em";
+  // Select the reference node
+  //var referenceNode = h1.firstChild;
+
+  // Insert the button element before the reference node
+  h1.appendChild(button);
+
+  button.addEventListener("click", async function () {
+    //for i in items array create a promise of that skuid in a url and fetch the json responses in a array
+    //then for each response check if the some item has availability 0 and distance_tier equal to 2
+    //if no then make the html item invisible
+    //if yes then make the html item visible
+    //console.log("φιλτράρισμα");
+    let furls=[];
+    for (let p of nodes){
+      let pd = getProductDetails(p);
+      if (pd == null || Object.values(pd).some((x) => x == null)) continue;
+      let filterurl="https://www.skroutz.gr/s/"+pd.skuid+"/products/filters"
+      furls.push(filterurl);
+    }
+    let resp=await fetchAllUrls(furls);
+    let close=[];
+    for (let r of resp){
+      if (r==null) close.push(false);
+      let prods=Object.values(r["products_specs"]);
+      let avail=prods.some((x)=>x["availability"]==1 && x["distance_tier"]==0);
+      close.push(avail);
+    }
+    //map close to nodes
+    console.log(nodes,close);
+    for (let i=0;i<close.length;i++){
+      if (close[i]) nodes[i].style.display="block";
+      else nodes[i].style.display="none";
+    }
+
+  });
 }
 
 
