@@ -43,14 +43,15 @@ style.innerHTML = `
 `;
 let pop;
 let lastel;
-let nodes=[];
+let nodes = [];
 document.head.appendChild(style);
 let timePeriods = ["all", "6_months", "3_months", "1_months"];
 
 let day = new Date().getDate();
-let getPos=(minEver,pr)=>{
-  if (minEver==0) return null;
-  else return (((minEver - pr) / minEver) * 100).toFixed(2)};
+let getPos = (minEver, pr) => {
+  if (minEver == 0) return null;
+  else return (((minEver - pr) / minEver) * 100).toFixed(2)
+};
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   if (document.getElementById(elmnt.id + "header")) {
@@ -134,13 +135,13 @@ if (n == null) {
   n = {};
   localStorage.setItem("graphs", JSON.stringify(n));
 }
-function cleanNdict(){
-for (let key in n){
-  if (n[key].hasOwnProperty("url")) delete n[key].url
-  if (n[key].day!=day) delete n[key]
-}
+function cleanNdict() {
+  for (let key in n) {
+    if (n[key].hasOwnProperty("url")) delete n[key].url
+    if (n[key].day != day) delete n[key]
+  }
 
-localStorage.setItem("graphs", JSON.stringify(n));
+  localStorage.setItem("graphs", JSON.stringify(n));
 }
 
 cleanNdict();
@@ -176,24 +177,24 @@ if (typeof button == "undefined") {
 async function computeSortedGraphs() {
   graphsLoaded = false;
   lists = findLists();
-  graphPromises=[];
-  nodes=[];
+  let graphPromises = [];
+  nodes = [];
   for (let l of lists) {
     if (
-          Array.from(l.children).some(
-            (x) => x.clientHeight < 300 || x.clientWidth < 200
-          )
-        ) {
-          l.style.alignItems = "flex-start";
-        }
+      Array.from(l.children).some(
+        (x) => x.clientHeight < 300 || x.clientWidth < 200
+      )
+    ) {
+      l.style.alignItems = "flex-start";
+    }
     // if (settings.autoLoadGraphs) 
-   //await getNodesGraphs(l.children)
-  nodes.push(...l.children)
-   graphPromises.push(getNodesGraphs(l.children));
-   //showGraphs(l.children)
+    //await getNodesGraphs(l.children)
+    nodes.push(...l.children)
+    graphPromises.push(getNodesGraphs(l.children));
+    //showGraphs(l.children)
   }
   await Promise.all(graphPromises);
-  for (let l of lists) {showGraphs(l.children)}
+  for (let l of lists) { showGraphs(l.children) }
   if (settings.autoSortProducts) sortPage();
   //fetchNextPage()
   if (!nowurl.includes("/s")) {
@@ -206,22 +207,23 @@ const targetNode = lists[0];
 const observer = new MutationObserver(async (mutations) => {
   //console.log("updated");
   //console.log(mutations.filter(x=>x.addedNodes.length>0));
-// if (){
-  
-//   if (
-//     Array.from(l.children).some(
-//       (x) => x.clientHeight < 300 || x.clientWidth < 200
-//     )
-//   ) {
-//     l.style.alignItems = "flex-start";
-//   }
-// }
-  if (mutations.some(x=>x.addedNodes.length>0 && x.target.baseURI!=nowurl)){
-  try {blurSp()
-    await computeSortedGraphs()
-    nowurl=document.baseURI;
-  }
-    catch (err){
+  // if (){
+
+  //   if (
+  //     Array.from(l.children).some(
+  //       (x) => x.clientHeight < 300 || x.clientWidth < 200
+  //     )
+  //   ) {
+  //     l.style.alignItems = "flex-start";
+  //   }
+  // }
+  if (mutations.some(x => x.addedNodes.length > 0 && x.target.baseURI != nowurl)) {
+    try {
+      blurSp()
+      await computeSortedGraphs()
+      nowurl = document.baseURI;
+    }
+    catch (err) {
       console.error(err);
     }
 
@@ -262,13 +264,14 @@ async function fetchDataOld(url) {
   }
   let res;
   let data;
-  try{
-   res = await fetch(url);
-   data = await res.json();}
-   catch(err){
+  try {
+    res = await fetch(url);
+    data = await res.json();
+  }
+  catch (err) {
     await awaitTimeout(1000);
-    data= await fetchData(url);
-   }
+    data = await fetchData(url);
+  }
   return data;
 }
 
@@ -281,7 +284,7 @@ async function fetchData(url, retries = 0) {
   }
   let res;
   let data;
-  try{
+  try {
     res = await fetch(url, { timeout: 5000 });
     data = await res.json();
   } catch (err) {
@@ -293,8 +296,10 @@ async function fetchData(url, retries = 0) {
     } else {
       //console.log(`Failed to fetch ${url} after 5 retries`);
       //throw err;
-    }}
-  return data;}
+    }
+  }
+  return data;
+}
 
 async function fetchAllUrls(urls) {
   let promises = [];
@@ -312,19 +317,19 @@ async function fetchAllUrlsOld(urls) {
   for (let url of urls) {
     let response;
     if (!retry[url]) {
-        retry[url] = 0;
+      retry[url] = 0;
     }
     while (response === undefined || response.status === 'rejected' && retry[url] < maxRetries) {
-        if (response && response.status === 'rejected') {
-            await new Promise(res => setTimeout(res, 300));
-            retry[url]++;
-        }
-        response = await fetchData(url);
+      if (response && response.status === 'rejected') {
+        await new Promise(res => setTimeout(res, 300));
+        retry[url]++;
+      }
+      response = await fetchData(url);
     }
     if (response.status === 'fulfilled') {
-        results.push(response.value);
+      results.push(response.value);
     } else {
-        console.log(`Failed to fetch ${url} after ${maxRetries} retries`);
+      console.log(`Failed to fetch ${url} after ${maxRetries} retries`);
     }
   }
   return results;
@@ -351,10 +356,10 @@ async function getSkus(url) {
   //let url; //vale to url tis selidas
   url = url.replace(".html", ".json");
   let res;
-  try{
-  res= await fetch(url);
+  try {
+    res = await fetch(url);
   }
-  catch{return null;}
+  catch { return null; }
   if (res.status != 200) return null;
   let data = await res.json();
 
@@ -409,18 +414,18 @@ function createGraphDataFromJSON(data, a) {
   // }
   //if (isSpons(product)) continue;
   //let url = a.url;
-  let pric=a.price;
+  let pric = a.price;
   //pairnw price ws string opote to metatrepw
   let current_price;
-  try{
-    current_price= parseFloat(
+  try {
+    current_price = parseFloat(
       pric
         .match(/[\d,\.]+/)[0]
         .replace(".", "")
         .replace(",", ".")
     );
   }
-  catch (err){
+  catch (err) {
     return null;
   }
 
@@ -452,8 +457,8 @@ function createGraphDataFromJSON(data, a) {
 
     const prices = values.map((v) => v["value"]).filter((p) => p !== 0.0);
     //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
- 
-    let minpr=null;
+
+    let minpr = null;
     let minprelements;
     if (prices.length == 0) {
       minpr = null;
@@ -463,19 +468,21 @@ function createGraphDataFromJSON(data, a) {
       minPrices.push(minpr);
       minStamps.push(null);
     } else {
-      if (period=="1_months"){
-        let clonepr=structuredClone(values).filter(v=>v["value"]!=0)
+      if (period == "1_months") {
+        let clonepr = structuredClone(values).filter(v => v["value"] != 0)
         while (clonepr.at(-1) && clonepr.at(-1)["value"] == current_price) clonepr.pop();
-        
-        minpr=Math.min(...clonepr.map(x=>x["value"]))
+
+        minpr = Math.min(...clonepr.map(x => x["value"]))
         minprelements = clonepr
-        .filter((x) => x.value == minpr)
-        .map((x) => x.timestamp);
+          .filter((x) => x.value == minpr)
+          .map((x) => x.timestamp);
       }
-      else{ minpr = Math.min(...prices);
-      minprelements = values
-        .filter((x) => x.value == minpr)
-        .map((x) => x.timestamp);}
+      else {
+        minpr = Math.min(...prices);
+        minprelements = values
+          .filter((x) => x.value == minpr)
+          .map((x) => x.timestamp);
+      }
       let tm = null;
       if (minprelements.length > 0) {
         tm = minprelements.at(-1);
@@ -499,7 +506,7 @@ function createGraphDataFromJSON(data, a) {
   });
   //let timi_el;
   minEver = Math.min(...minPrices.filter((x) => x != null));
-  let pos=parseFloat(getPos(minEver, current_price))
+  let pos = parseFloat(getPos(minEver, current_price))
   let minind = minPrices.indexOf(minEver);
   let ltimestamp;
   try {
@@ -521,8 +528,8 @@ function createGraphDataFromJSON(data, a) {
     lastTimestamp: ltimestamp,
     day: day,
     price: current_price,
-    pososto:pos,
-    id:a.skuid
+    pososto: pos,
+    id: a.skuid
   };
   //console.log(ret);
   n[a.skuid] = ret;
@@ -811,7 +818,7 @@ function addButton(h1) {
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
   img.setAttribute("height", "24");
-  img.setAttribute("weight", "24");
+  img.setAttribute("width", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -824,7 +831,6 @@ function addButton(h1) {
   button.style.marginLeft = "3em";
   // Select the reference node
   //var referenceNode = h1.firstChild;
-  Promise(urls)
   // Insert the button element before the reference node
   h1.appendChild(button);
 
@@ -843,7 +849,7 @@ function addDealsButton(h1) {
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
   img.setAttribute("height", "24");
-  img.setAttribute("weight", "24");
+  img.setAttribute("width", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -861,9 +867,9 @@ function addDealsButton(h1) {
   h1.appendChild(graphsbutton);
   button.onclick = function () {
     console.log("PRODUCT DEALS ΣΗΜΕΡΑ:")
-    let d=productDeals(30);
-    for (let pr of d){
-      console.log(pr.url,pr)
+    let d = productDeals(30);
+    for (let pr of d) {
+      console.log(pr.url, pr)
     }
     // console.log();
   };
@@ -879,11 +885,11 @@ function addScanButton(h1) {
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
   img.setAttribute("height", "24");
-  img.setAttribute("weight", "24");
+  img.setAttribute("width", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
-  button.style.marginLeft="1em"
+  button.style.marginLeft = "1em"
   button.setAttribute("type", "button");
   // Set the onclick attribute of the button element to the desired function
   button.setAttribute(
@@ -893,7 +899,7 @@ function addScanButton(h1) {
   const loadingIcon = document.createElement("div");
   loadingIcon.classList.add("loading-icon");
   button.appendChild(loadingIcon);
-  loadingIcon.style.display="none";
+  loadingIcon.style.display = "none";
 
   //graphsbutton.style.marginLeft = "20em";
   // Select the reference node
@@ -902,9 +908,11 @@ function addScanButton(h1) {
   // Insert the button element before the reference node
   h1.appendChild(graphsbutton);
   button.onclick = async function () {
-    loadingIcon.style.display="block";
-    await fetchAllPagesStats().then(()=>{loadingIcon.style.display="none";
-    try{cleanNdict();}catch{let tpt=""}})
+    loadingIcon.style.display = "block";
+    await fetchAllPagesStats().then(() => {
+      loadingIcon.style.display = "none";
+      try { cleanNdict(); } catch { let tpt = "" }
+    })
     // console.log();
   };
 }
@@ -920,7 +928,7 @@ function addFilterButton(h1) {
     "https://icon-library.com/images/distance-icon/distance-icon-6.jpg";
   img.src = filterUrl;
   img.setAttribute("height", "24");
-  img.setAttribute("weight", "24");
+  img.setAttribute("width", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -943,26 +951,26 @@ function addFilterButton(h1) {
     //if no then make the html item invisible
     //if yes then make the html item visible
     //console.log("φιλτράρισμα");
-    let furls=[];
-    for (let p of nodes){
+    let furls = [];
+    for (let p of nodes) {
       let pd = getProductDetails(p);
       if (pd == null || Object.values(pd).some((x) => x == null)) continue;
-      let filterurl="https://www.skroutz.gr/s/"+pd.skuid+"/products/filters"
+      let filterurl = "https://www.skroutz.gr/s/" + pd.skuid + "/products/filters"
       furls.push(filterurl);
     }
-    let resp=await fetchAllUrls(furls);
-    let close=[];
-    for (let r of resp){
-      if (r==null) close.push(false);
-      let prods=Object.values(r["products_specs"]);
-      let avail=prods.some((x)=>x["availability"]==1 && x["distance_tier"]==0);
+    let resp = await fetchAllUrls(furls);
+    let close = [];
+    for (let r of resp) {
+      if (r == null) close.push(false);
+      let prods = Object.values(r["products_specs"]);
+      let avail = prods.some((x) => x["availability"] == 1 && x["distance_tier"] == 0);
       close.push(avail);
     }
     //map close to nodes
-    console.log(nodes,close);
-    for (let i=0;i<close.length;i++){
-      if (close[i]) nodes[i].style.display="block";
-      else nodes[i].style.display="none";
+    console.log(nodes, close);
+    for (let i = 0; i < close.length; i++) {
+      if (close[i]) nodes[i].style.display = "block";
+      else nodes[i].style.display = "none";
     }
 
   });
@@ -984,7 +992,7 @@ function addGraphButton(h1) {
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
   img.setAttribute("height", "24");
-  img.setAttribute("weight", "24");
+  img.setAttribute("width", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -1007,7 +1015,7 @@ function addGraphButton(h1) {
   div.appendChild(setting);
   setting.innerHTML = `<input type="checkbox" style="-webkit-appearance: none;" id="autoloadgraphs" name="graphsload">
   <label for="autoloadgraphs"> Αυτόματη φόρτωση διαγραμμάτων</label><br>`;
-  tickbox = setting.getElementsByTagName("input")[0];
+  let tickbox = setting.getElementsByTagName("input")[0];
   tickbox.className = "my-checkbox";
   if (tickbox) {
     tickbox.checked = settings.autoLoadGraphs;
@@ -1078,7 +1086,7 @@ function addSortButton(h1) {
   //img.innerHTML=`<img id="icon" src="./images/delete.png">`
   img.src = delurl;
   img.setAttribute("height", "24");
-  img.setAttribute("weight", "24");
+  img.setAttribute("width", "24");
 
   // Append the img element to the button element
   button.appendChild(img);
@@ -1101,7 +1109,7 @@ function addSortButton(h1) {
   div.appendChild(setting);
   setting.innerHTML = `<input type="checkbox" style="-webkit-appearance: none;" id="autoSortProducts" name="graphsload">
   <label for="autoSortProducts"> Αυτόματη ταξινόμηση προϊόντων</label><br>`;
-  tickbox = setting.getElementsByTagName("input")[0];
+  let tickbox = setting.getElementsByTagName("input")[0];
   tickbox.className = "my-checkbox";
   if (tickbox) {
     tickbox.checked = settings.autoSortProducts;
@@ -1119,7 +1127,7 @@ function addSortButton(h1) {
   });
 }
 function sortPage() {
-  for (skuList of lists) {
+  for (let skuList of lists) {
     // if (!graphsLoaded) {
     //   await getNodesGraphs(skuList.children);
     // }
@@ -1182,7 +1190,7 @@ function findLists() {
   possibles.push(...document.body.getElementsByTagName("ol"));
   let contposs = null;
   contposs = possibles.filter((x) => {
-    str = x.className;
+    let str = x.className;
     return (
       !str.includes("filter") &&
       !str.includes("shadow") &&
@@ -1208,8 +1216,8 @@ function findLists() {
       contposs = contposs.filter((x) => x.tagName == "UL");
     }
   }
-  if (contposs.length==1) return contposs
-  return contposs.filter(x=>!x.querySelector(".gram"))
+  if (contposs.length == 1) return contposs
+  return contposs.filter(x => !x.querySelector(".gram"))
 
 }
 function getProductDetails(p) {
@@ -1256,12 +1264,12 @@ function getProductDetails(p) {
   }
   return { price: price, title: title, url: url, skuid: skuid };
 }
-function hasRecentGraph(skuid, price=null){
+function hasRecentGraph(skuid, price = null) {
   if (n.hasOwnProperty(skuid.toString()) &&
-      n[skuid].hasOwnProperty("day") &&
-      n[skuid]["day"] == day &&
-      n[skuid]["price"]==price &&
-      Object.values(n[skuid]).every((x) => x != null)) return true
+    n[skuid].hasOwnProperty("day") &&
+    n[skuid]["day"] == day &&
+    n[skuid]["price"] == price &&
+    Object.values(n[skuid]).every((x) => x != null)) return true
   else return false;
 }
 async function getNodesGraphs(nodes) {
@@ -1284,8 +1292,8 @@ async function getNodesGraphs(nodes) {
   //let filtered = results.filter((x) => !n.hasOwnProperty(x.skuid.toString()));
   console.log(Object.values(n).length);
   return results;
-  
-  
+
+
 }
 function showGraphs(nodes) {
   for (let p of nodes) {
@@ -1324,7 +1332,7 @@ async function fetchNextPage() {
 }
 
 function createGraphData(a) {
-  
+
   let url = a.url;
   let current_price = a.price;
 
@@ -1352,8 +1360,8 @@ function createGraphData(a) {
         timePeriods.forEach((period) => {
           const values = data["min_price"]["graphData"][period]["values"];
           const prices = values.map((v) => v["value"]).filter((p) => p !== 0.0);
-              
-          let minpr=null;
+
+          let minpr = null;
           let minprelements;
           if (prices.length == 0) {
             minpr = null;
@@ -1363,29 +1371,31 @@ function createGraphData(a) {
             minPrices.push(minpr);
             minStamps.push(null);
           } else {
-            if (period=="1_months"){
-          //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
-              let clonepr=structuredClone(values).filter(v=>v["value"]!=0)
+            if (period == "1_months") {
+              //VGAZEI OLES TIS PROSFATES TIMES POU EINAI ISES ME TIN TWRINI TIMI
+              let clonepr = structuredClone(values).filter(v => v["value"] != 0)
               while (clonepr.at(-1) && clonepr.at(-1)["value"] == current_price) clonepr.pop();
-              
-              minpr=Math.min(...clonepr.map(x=>x["value"]))
-              if (clonepr.length==0){
-                minpr=current_price
-                clonepr=values;
+
+              minpr = Math.min(...clonepr.map(x => x["value"]))
+              if (clonepr.length == 0) {
+                minpr = current_price
+                clonepr = values;
               }
               minprelements = clonepr
-              .filter((x) => x.value == minpr)
-              .map((x) => x.timestamp);
+                .filter((x) => x.value == minpr)
+                .map((x) => x.timestamp);
             }
-            else{ minpr = Math.min(...prices);
-            minprelements = values
-              .filter((x) => x.value == minpr)
-              .map((x) => x.timestamp);}
+            else {
+              minpr = Math.min(...prices);
+              minprelements = values
+                .filter((x) => x.value == minpr)
+                .map((x) => x.timestamp);
+            }
             let tm = null;
             if (minprelements.length > 0) {
               tm = minprelements.at(-1);
             }
-            
+
             let mean = parseFloat(d3.mean(prices).toFixed(2));
             let median = parseFloat(d3.median(prices).toFixed(2));
             let std;
@@ -1403,7 +1413,7 @@ function createGraphData(a) {
         });
 
         minEver = Math.min(...minPrices.filter((x) => x != null));
-        let pos=parseFloat(getPos(minEver, current_price))
+        let pos = parseFloat(getPos(minEver, current_price))
         let minind = minPrices.indexOf(minEver);
         let ltimestamp;
         try {
@@ -1422,10 +1432,10 @@ function createGraphData(a) {
           title: a.title,
           minpr: minEver,
           lastTimestamp: ltimestamp,
-          day:day,
-          price:current_price,
-          pososto:pos,
-          id:a.skuid
+          day: day,
+          price: current_price,
+          pososto: pos,
+          id: a.skuid
         };
         //console.log(ret);
         n[a.skuid] = ret;
@@ -1438,81 +1448,83 @@ function createGraphData(a) {
   });
 }
 
-async function fetchAllPagesStats(number=50){
- let pages;
- let te=document.getElementsByClassName("react-component paginator cf")
- if (te.length>0){
-  let lp=Array.from(te[0].children).at(-2)
-  let m=lp.lastChild.href.match(/page\=(\d+)/)
- if (m){
-  pages=parseInt(m[1])
- }
- else{
-  return null;
- }
- }
- else return null;
- 
-
-let url_template=nextPage()
-let urls=[]
-for (let i=1; i<=pages; i++){
-urls.push(url_template.replace(/page\=\d+/,"page="+String(i)))
-}
-let promises=[];
-for (let u of urls){
-  promises.push(getSkus(u))
-}
-let skus=[];
-let pagesskus=await Promise.all(promises);
-for (let p of pagesskus){
-  skus.push(...p)
-}
-let b=location.hostname;
-let skus_nograph = skus.filter((x) => !hasRecentGraph(x.skuid, x.price));
-let skus_graph=skus.filter((x) => hasRecentGraph(x.skuid, x.price));
-urls=skus_nograph.map((x) => x.url);
-promises=[];
-let graphsdata = await fetchAllUrls(urls);
-let lista=skus_graph.map(x=>{let ret=n[x.skuid];ret["url"]=b+x.url.replace("/price_graph.json",".html");return ret;})
-for (let i = 0; i < graphsdata.length; i++) {
-  if (graphsdata[i] != {}) {let ret=createGraphDataFromJSON(graphsdata[i], skus_nograph[i]);
-    if (ret==null ) continue;
-    ret["url"]=b+skus_nograph[i].url.replace("/price_graph.json",".html");
-    lista.push(ret)};
-}
-console.clear();
-console.log(lista.length);
-lista=lista.filter(x=>x!=null).filter((x) => x.day == day)
-.filter((x) => x.title != null);
-skus.filter(x=>n.hasOwnProperty(x.skuid.toString()))
-lista.sort((a, b) => {
-  // Compare the perc property
-  if (b.pososto == null) return -1;
-  else if (a.pososto == null) return 1;
-  if (a.pososto > b.pososto) {
-    return -1;
-  } else if (a.pososto < b.pososto) {
-    return 1;
-  } else {
-    return 0;
+async function fetchAllPagesStats(number = 50) {
+  let pages;
+  let te = document.getElementsByClassName("react-component paginator cf")
+  if (te.length > 0) {
+    let lp = Array.from(te[0].children).at(-2)
+    let m = lp.lastChild.href.match(/page\=(\d+)/)
+    if (m) {
+      pages = parseInt(m[1])
+    }
+    else {
+      return null;
+    }
   }
-});
-//TYPWSE
-console.log("TOP 50 DEALS ΑΠΟ ΠΡΟΙΟΝΤΑ ΟΛΩΝ ΤΩΝ ΣΕΛΙΔΩΝ:")
-let printlista = structuredClone(lista.slice(0, number));
+  else return null;
 
-printlista.forEach((x) => {
-  delete x.graphdata;
-  delete x.day;
-  if (!x.hasOwnProperty("price")) x.price = ((1 - x.pososto / 100) * x.minpr).toFixed(2);
-  x.lastTimeLow = new Date(x.lastTimestamp * 1000).toDateString().slice(4);
-  delete x.lastTimestamp;
-  delete x.id;
-});
-for(let item of printlista){
-  console.log(item.url,item)
-}
+
+  let url_template = nextPage()
+  let urls = []
+  for (let i = 1; i <= pages; i++) {
+    urls.push(url_template.replace(/page\=\d+/, "page=" + String(i)))
+  }
+  let promises = [];
+  for (let u of urls) {
+    promises.push(getSkus(u))
+  }
+  let skus = [];
+  let pagesskus = await Promise.all(promises);
+  for (let p of pagesskus) {
+    skus.push(...p)
+  }
+  let b = location.hostname;
+  let skus_nograph = skus.filter((x) => !hasRecentGraph(x.skuid, x.price));
+  let skus_graph = skus.filter((x) => hasRecentGraph(x.skuid, x.price));
+  urls = skus_nograph.map((x) => x.url);
+  promises = [];
+  let graphsdata = await fetchAllUrls(urls);
+  let lista = skus_graph.map(x => { let ret = n[x.skuid]; ret["url"] = b + x.url.replace("/price_graph.json", ".html"); return ret; })
+  for (let i = 0; i < graphsdata.length; i++) {
+    if (graphsdata[i] != {}) {
+      let ret = createGraphDataFromJSON(graphsdata[i], skus_nograph[i]);
+      if (ret == null) continue;
+      ret["url"] = b + skus_nograph[i].url.replace("/price_graph.json", ".html");
+      lista.push(ret)
+    };
+  }
+  console.clear();
+  console.log(lista.length);
+  lista = lista.filter(x => x != null).filter((x) => x.day == day)
+    .filter((x) => x.title != null);
+  skus.filter(x => n.hasOwnProperty(x.skuid.toString()))
+  lista.sort((a, b) => {
+    // Compare the perc property
+    if (b.pososto == null) return -1;
+    else if (a.pososto == null) return 1;
+    if (a.pososto > b.pososto) {
+      return -1;
+    } else if (a.pososto < b.pososto) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+  //TYPWSE
+  console.log("TOP 50 DEALS ΑΠΟ ΠΡΟΙΟΝΤΑ ΟΛΩΝ ΤΩΝ ΣΕΛΙΔΩΝ:")
+  let printlista = structuredClone(lista.slice(0, number));
+
+  printlista.forEach((x) => {
+    delete x.graphdata;
+    delete x.day;
+    if (!x.hasOwnProperty("price")) x.price = ((1 - x.pososto / 100) * x.minpr).toFixed(2);
+    x.lastTimeLow = new Date(x.lastTimestamp * 1000).toDateString().slice(4);
+    delete x.lastTimestamp;
+    delete x.id;
+  });
+  for (let item of printlista) {
+    console.log(item.url, item)
+  }
 
 }
 
@@ -1541,7 +1553,7 @@ function createGraph(obj, product, skuid, title, pr) {
   }
   let gram = document.createElement("span");
   gram.className = "gram";
-  let pos=obj["pososto"]
+  let pos = obj["pososto"]
   if (minEver != 0) {
     gram.innerText = `ελάχιστο: ${minEver}`;
     //let pos = null;
@@ -1605,13 +1617,14 @@ function createGraph(obj, product, skuid, title, pr) {
   ctx.style.display = "none";
   pop.appendChild(ctx);
   product.addEventListener("mouseenter", function () {
-    if (settings.autoLoadGraphs){
-    if (lastel) lastel.style.display = "none";
-    pop.style.display = "block";
-    ctx.style.display = "block";
-    pop.querySelector("span").innerText = title;
-    lastel = ctx;
-}});
+    if (settings.autoLoadGraphs) {
+      if (lastel) lastel.style.display = "none";
+      pop.style.display = "block";
+      ctx.style.display = "block";
+      pop.querySelector("span").innerText = title;
+      lastel = ctx;
+    }
+  });
 
   const chart = new Chart(ctx, {
     type: "bar",
@@ -1705,14 +1718,14 @@ function createGraph(obj, product, skuid, title, pr) {
   return obj;
 }
 
-function productDeals(number=50) {
+function productDeals(number = 50) {
   let today = structuredClone(Object.values(n))
     .filter((x) => x.day == day)
     .filter((x) => x.title != null);
   today.sort((a, b) => {
     // Compare the perc property
     if (b.pososto == null) return -1;
-    else if (a.pososto == null) return 1;((a, b) => {
+    else if (a.pososto == null) return 1; ((a, b) => {
       // Compare the perc property
       if (b.pososto == null) return -1;
       else if (a.pososto == null) return 1;
@@ -1724,7 +1737,7 @@ function productDeals(number=50) {
         return 0;
       }
     });
-    if (a.pososto > b.pososto) {  
+    if (a.pososto > b.pososto) {
       return -1;
     } else if (a.pososto < b.pososto) {
       return 1;
@@ -1742,7 +1755,7 @@ function productDeals(number=50) {
       "https://www.skroutz.gr/s/" +
       x.id +
       "/" +
-      x.title.replaceAll(/[\s\/\(\)\"\.]+/gm,"-").replace(/\-$/,"") +
+      x.title.replaceAll(/[\s\/\(\)\"\.]+/gm, "-").replace(/\-$/, "") +
       ".html";
     delete x.lastTimestamp;
   });

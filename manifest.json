@@ -10,28 +10,35 @@
   "content_scripts": [
     {
       "matches": ["https://www.skroutz.gr/cart*"],
-      "js": ["cart.js"]
+      "js": ["src/content-scripts/cart.js"]
     },
-  {
-    "matches": ["https://www.skroutz.gr/c/*","https://www.skroutz.gr/search*"],
-    "js": ["search.js","Chart.js","d3.v7.min.js","grafima.js"],
-    "type": "module"
-  },
-  {
-    "matches": ["https://www.skroutz.gr/s/*"],
-    "js": ["product.js","Chart.js","d3.v7.min.js","grafima.js"],
-    "type": "module"
-  },{
-    "matches": ["https://www.skroutz.gr/prosfores*","https://www.skroutz.gr/account/*","https://www.skroutz.gr/plus-deals*","https://www.skroutz.gr/shop*","https://www.skroutz.gr/m.*","https://*.skroutz.gr/"],
-    "js": ["Chart.js","d3.v7.min.js","grafima.js"],
-    "type": "module"
-  }],
-  "background": {
-    "service_worker": "background.js",
-    "web_accessible_resources": [
-      {"resources":[
-      "images/deletecart.png", "*.js"],
-      "matches": ["https://*.skroutz.gr/*"]}
-    ]
-  }
+    {
+      "matches": ["https://www.skroutz.gr/c/*", "https://www.skroutz.gr/search*"],
+      "js": ["src/content-scripts/search.js", "src/lib/Chart.js", "src/lib/d3.v7.min.js", "src/content-scripts/grafima.js"],
+      "type": "module"
+    },
+    {
+      "matches": ["https://www.skroutz.gr/s/*"],
+      "js": ["src/content-scripts/product.js", "src/lib/Chart.js", "src/lib/d3.v7.min.js", "src/content-scripts/grafima.js"],
+      "type": "module"
+    },
+    {
+      "matches": [
+        "https://www.skroutz.gr/prosfores*",
+        "https://www.skroutz.gr/account/*",
+        "https://www.skroutz.gr/plus-deals*",
+        "https://www.skroutz.gr/shop*",
+        "https://www.skroutz.gr/m.*",
+        "https://*.skroutz.gr/"
+      ],
+      "js": ["src/lib/Chart.js", "src/lib/d3.v7.min.js", "src/content-scripts/grafima.js"],
+      "type": "module"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/assets/images/deletecart.png", "src/**/*.js"],
+      "matches": ["https://*.skroutz.gr/*"]
+    }
+  ]
 }
