@@ -3,3 +3,7 @@ text.txt
 *.zip
 folder/
 .vscode/
+node_modules/
+.output/
+.wxt/
+stats.html

@@ -1,0 +1,47 @@
+{
+"cart": {
+"cart_type": "primary",
+"user_location": {
+"zip": "10563",
+"description": "Αθήνα",
+"country_code": "GR",
+"location_user_defined": false,
+"lat": "37.975553",
+"lng": "23.734902",
+"is_skroutz_point": true
+},
+"line_items": {
+"432036263": {
+"sku_id": 59304245,
+"quantity": 1,
+"size": null,
+"merchant_size": null,
+"max_quantity": 78,
+"product_id": 249000737,
+"assortments": null,
+"selected": true,
+"source": "sku",
+"additional_service_ids": null,
+"additional_services_category_id": null,
+"quantity_discount_multi_product_promo_id": null,
+"cyprus_fast_delivery": null
+},
+"432036270": {
+"sku_id": 70154067,
+"quantity": 1,
+"size": null,
+"merchant_size": null,
+"max_quantity": 4,
+"product_id": 308120648,
+"assortments": null,
+"selected": true,
+"source": "merchant_offering",
+"additional_service_ids": null,
+"additional_services_category_id": null,
+"quantity_discount_multi_product_promo_id": null,
+"cyprus_fast_delivery": null
+}
+},
+"proposals": []
+}
+}

@@ -1,0 +1,2932 @@
+<turbo-frame id="shops-list-frame">
+  <div data-controller="sku-page--shops-list--filters"
+       data-sku-page--shops-list--filters-reset-url-value="/s/59304245/shops_list?sponsored_product_card_ids%5B%5D=276686013">
+    <div class="filters-wrapper">
+  <div class="sku-actions-location-wrapper">
+    <span class="separator"></span>
+    <div class="sku-actions-wrapper">
+      <div class="filters-fab-sticky-wrapper">
+        <button type="button" id="filters-section-link" role="tab"
+                aria-controls="shops-list-filters" aria-expanded="false"
+                data-sku-page--shops-list--drawer-target="filtersFab"
+                data-action="click->sku-page--shops-list--drawer#toggleFilters"
+                class="button button-icon button-primary icon toggle-product-card-filters visible-label"><span class="filters-fab-label">Φίλτρα</span></button>
+      </div>
+
+      <div class="cf content-scrollable sku-actions"
+           data-controller="horizontal-scrolling"
+           data-horizontal-scrolling-unit-value="percent"
+           data-horizontal-scrolling-offset-value="60">
+        <div class="scroll-area"
+             data-horizontal-scrolling-target="scrollable"
+             data-action="scroll->sku-page--shops-list--drawer#collapseFiltersLabel">
+            <button type="button" id="sorting-section-link"
+          class="button button-outlined-tertiary icon toggle-product-card-sorting"
+          aria-controls="shops-list-sorting" aria-expanded="false"
+          data-action="click->sku-page--shops-list--drawer#toggleSorting"><span
+    class="sorting-fab-label">Φθηνότερη τιμή</span></button>
+
+            <div id="shops-list-order-options" class="order-options"
+       data-controller="toggle"
+       data-toggle-toggle-class="active"
+       data-action="click@window->toggle#classOff">
+    <ul>
+        <li>
+          <a title="Φθηνότερη τιμή" rel="nofollow" class="order-option icon" data-action="click-&gt;toggle#classToggle:stop:prevent" href="/s/59304245/shops_list?fe=sort.cheapest&amp;sponsored_product_card_ids%5B%5D=276686013">
+            <span class="order-option-label">
+              Φθηνότερη τιμή
+            </span>
+</a>        </li>
+        <li>
+          <a title="Φθηνότερη τελική τιμή" rel="nofollow" class="order-option icon" data-turbo="true" href="/s/59304245/shops_list?fe=sort.final_price&amp;order_by=final_price&amp;sponsored_product_card_ids%5B%5D=276686013">
+            <span class="order-option-label">
+              Φθηνότερη τελική τιμή
+                <small>(τιμή & μεταφορικά)</small>
+            </span>
+</a>        </li>
+        <li>
+          <a title="Γρηγορότερο" rel="nofollow" class="order-option icon" data-turbo="true" href="/s/59304245/shops_list?fe=sort.delivery&amp;order_by=delivery&amp;sponsored_product_card_ids%5B%5D=276686013">
+            <span class="order-option-label">
+              Γρηγορότερο
+            </span>
+</a>        </li>
+        <li>
+          <a title="Κοντινότερο" rel="nofollow" class="order-option icon" data-turbo="true" href="/s/59304245/shops_list?fe=sort.distance&amp;order_by=distance&amp;sponsored_product_card_ids%5B%5D=276686013">
+            <span class="order-option-label">
+              Κοντινότερο
+            </span>
+</a>        </li>
+    </ul>
+  </div>
+
+
+            <button type="button" id="delivery-section-link"
+                    class="chip button button-outlined-tertiary icon toggle-product-card-delivery"
+                    aria-controls="shops-list-delivery" aria-expanded="false"
+                    data-action="click->sku-page--shops-list--drawer#toggleDelivery"><label>Επιλογές παράδοσης</label></button>
+
+            <button type="button" id="distance-section-link"
+                    class="chip button button-outlined-tertiary icon toggle-product-card-distance"
+                    aria-controls="shops-list-distance" aria-expanded="false"
+                    data-action="click->sku-page--shops-list--drawer#toggleDistance"><label>Απόσταση</label></button>
+
+
+        </div>
+        <button type="button" class="slider-btn small-btn prev icon" disabled
+                aria-label="Προηγούμενο"
+                data-horizontal-scrolling-target="leftButton"
+                data-action="click->horizontal-scrolling#scrollLeft"></button>
+        <button type="button" class="slider-btn small-btn next icon" disabled
+                aria-label="Επόμενο"
+                data-horizontal-scrolling-target="rightButton"
+                data-action="click->horizontal-scrolling#scrollRight"></button>
+      </div>
+    </div>
+    <span class="separator"></span>
+      <div class="blp-prompt js-blp-prompt">
+        <p class="blp-prompt-header">
+          <span>Υπολογισμός πληροφοριών για:</span>
+        </p>
+        <div class="blp-prompt-content">
+            <span class="blp-thumbnail">
+              <img alt="Samsung Galaxy A56 5G Dual SIM (8/128GB) Awesome Graphite" class="blp-prompt-thumbnail" loading="lazy" src="https://b.scdn.gr/images/sku_main_images/059304/59304245/medium_20250319104440_samsung_galaxy_a56_5g_dual_sim_8gb_128gb_gri.jpeg" />
+            </span>
+          <span class="blp-location" data-type="personalization-settings" role="button"
+                data-action="click->sku-page--shops-list--filters#openPersonalization">
+            <img class="blp-prompt-map" loading="lazy" src="//www.skroutz.gr/assets/schwartz/ecommerce/personalization_marker-fbb5431a41ff0ae84490958a8a531e38.png" />
+            <p>
+              Αθήνα
+            </p>
+            <i class="ds-icon icon-ds-chevron-right"></i>
+          </span>
+        </div>
+      </div>
+  </div>
+  <div id="shops-list-filters" class="full-screen-section shops-list-filters-section"
+     role="tabpanel" aria-labelledby="filters-section-link">
+  <div class="full-screen-section-header">
+    <button type="button" class="btn-reset icon back-icon-btn"
+            aria-label="Close Section"
+            data-action="click->sku-page--shops-list--drawer#closeFilters"></button>
+    <h2>Φίλτρα</h2>
+  </div>
+  <div class="full-screen-section-content">
+    <div class="sku-filters-container">
+      <form data-turbo="true" data-turbo-frame="shops-list-frame" data-action="change-&gt;sku-page--shops-list--filters#apply" action="/s/59304245/shops_list" accept-charset="UTF-8" method="get">
+        <input autocomplete="off" value="276686013" type="hidden" name="sponsored_product_card_ids[]" />
+
+  <input autocomplete="off" type="hidden" name="fe" />
+
+  <div class="sku-filters content cf"
+         data-controller="sku-page--shops-list--map"
+         data-sku-page--shops-list--map-sku-id-value="59304245"
+         data-sku-page--shops-list--map-distance-tier-value="3"
+       >
+      <div class="order-by-filters">
+        <h4>Ταξινόμηση</h4>
+        <ul>
+    <li>
+      <a class="icon filter-option order-option filter-radio selected" title="Φθηνότερη τιμή" rel="nofollow" data-turbo="true" href="/s/59304245/shops_list?fe=sort.cheapest&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">
+          Φθηνότερη τιμή
+        </span>
+</a>    </li>
+    <li>
+      <a class="icon filter-option order-option filter-radio" title="Φθηνότερη τελική τιμή" rel="nofollow" data-turbo="true" href="/s/59304245/shops_list?fe=sort.final_price&amp;order_by=final_price&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">
+          Φθηνότερη τελική τιμή
+            <small>(τιμή & μεταφορικά)</small>
+        </span>
+</a>    </li>
+    <li>
+      <a class="icon filter-option order-option filter-radio" title="Γρηγορότερο" rel="nofollow" data-turbo="true" href="/s/59304245/shops_list?fe=sort.delivery&amp;order_by=delivery&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">
+          Γρηγορότερο
+        </span>
+</a>    </li>
+    <li>
+      <a class="icon filter-option order-option filter-radio" title="Κοντινότερο" rel="nofollow" data-turbo="true" href="/s/59304245/shops_list?fe=sort.distance&amp;order_by=distance&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">
+          Κοντινότερο
+        </span>
+</a>    </li>
+</ul>
+
+      </div>
+
+      <div class="availability-filters">
+        <h4>Επιλογές παράδοσης</h4>
+        <ul>
+    <li>
+      <a class="icon filter-option count-alt filter-radio highlighted" title="Αύριο" rel="nofollow" data-turbo="true" data-filter-key="availability expressDelivery expressDeliverySpeed" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter" href="/s/59304245/shops_list?express_delivery_speed=tomorrow&amp;fe=delivery.tomorrow&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">Αύριο </span>
+        <small>2</small>
+</a>    </li>
+    <li>
+      <a class="icon filter-option count-alt filter-radio" title="έως 8 ημέρες" rel="nofollow" data-turbo="true" data-filter-key="availability expressDelivery expressDeliverySpeed" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter" href="/s/59304245/shops_list?availability=2&amp;fe=delivery.availability_2&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">έως 8 ημέρες </span>
+        <small>5</small>
+</a>    </li>
+
+    <li>
+      <a class="icon filter-option count-alt filter-checkbox" title="Παραλαβή από το κατάστημα" rel="nofollow" data-turbo="true" href="/s/59304245/shops_list?fe=delivery.store_pickup.on&amp;sponsored_product_card_ids%5B%5D=276686013&amp;store_pickup=1">
+        <span class="filter-text">Παραλαβή από το κατάστημα </span>
+        <small>2</small>
+</a>    </li>
+</ul>
+
+      </div>
+
+      <div class="shop-service-filters sku-filter">
+        <h4>Παροχές καταστήματος</h4>
+        <ul>
+            <li>
+              <input type="checkbox" name="binary[]" id="shops-list-filter-ecommerce-available" value="ecommerce_available" class="checkbox" data-filter-key="ecommerceAvailable" data-filter-event="binary.ecommerce_available" data-action="change-&gt;sku-page--shops-list--filters#clearStoredFilter" />
+              <label for="shops-list-filter-ecommerce-available" class="icon">Αγορά μέσω Skroutz</label>
+            </li>
+            <li>
+              <input type="checkbox" name="binary[]" id="shops-list-filter-free-shipping" value="free_shipping" class="checkbox" data-filter-key="freeShipping" data-filter-event="binary.free_shipping" data-action="change-&gt;sku-page--shops-list--filters#clearStoredFilter" />
+              <label for="shops-list-filter-free-shipping" class="icon">Δωρεάν μεταφορικά</label>
+            </li>
+            <li>
+              <input type="checkbox" name="binary[]" id="shops-list-filter-official-reseller" value="official_reseller" class="checkbox" data-filter-key="officialReseller" data-filter-event="binary.official_reseller" data-action="change-&gt;sku-page--shops-list--filters#clearStoredFilter" />
+              <label for="shops-list-filter-official-reseller" class="icon">Επίσημος μεταπωλητής</label>
+            </li>
+        </ul>
+      </div>
+
+      <div class="sku-filter distance-filters">
+  <h4>
+    Απόσταση καταστήματος από:
+    <button type="button" class="btn-reset" data-type="personalization-settings"
+            data-action="click->sku-page--shops-list--filters#openPersonalization">
+      <i class="ds-icon icon-ds-pin"></i> <span>Αθήνα</span>
+    </button>
+  </h4>
+  
+  <ul class="distance-chips">
+      <li>
+          <a class="chip button button-outlined-tertiary" rel="nofollow" data-turbo="true" data-filter-key="distanceTier" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter" href="/s/59304245/shops_list?distance=2&amp;fe=distance.2&amp;sponsored_product_card_ids%5B%5D=276686013">2 χλμ</a>
+      </li>
+      <li>
+          <a class="chip button button-outlined-tertiary" rel="nofollow" data-turbo="true" data-filter-key="distanceTier" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter" href="/s/59304245/shops_list?distance=5&amp;fe=distance.5&amp;sponsored_product_card_ids%5B%5D=276686013">5 χλμ</a>
+      </li>
+      <li>
+          <a class="chip button button-outlined-tertiary" rel="nofollow" data-turbo="true" data-filter-key="distanceTier" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter" href="/s/59304245/shops_list?distance=10&amp;fe=distance.10&amp;sponsored_product_card_ids%5B%5D=276686013">10 χλμ</a>
+      </li>
+  </ul>
+
+</div>
+
+      <div class="map-container" data-sku-page--shops-list--map-target="container"></div>
+  </div>
+</form>
+      <div class="bottom-actions">
+        <button type="button" class="button button-primary"
+                data-action="click->sku-page--shops-list--drawer#closeFilters">
+          17 Καταστήματα
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div id="shops-list-sorting"
+     class="bottom-drawer filter-bottom-drawer shops-list-sorting-drawer"
+     role="dialog" aria-modal="true" aria-hidden="true"
+     aria-labelledby="shops-list-sorting-title"
+     data-action="click->sku-page--shops-list--drawer#closeSortingOnBackdrop">
+  <div class="bottom-drawer-content">
+    <div class="bottom-drawer-header">
+      <h2 class="bottom-drawer-title" id="shops-list-sorting-title">Ταξινόμηση</h2>
+      <button type="button" class="bottom-drawer-close icon"
+              aria-label="Κλείσιμο"
+              data-action="click->sku-page--shops-list--drawer#closeSorting">Κλείσιμο</button>
+    </div>
+    <div class="bottom-drawer-body">
+      <ul>
+    <li>
+      <a class="icon filter-option order-option filter-radio selected" title="Φθηνότερη τιμή" rel="nofollow" data-turbo="true" data-action="click-&gt;sku-page--shops-list--drawer#closeSorting" href="/s/59304245/shops_list?fe=sort.cheapest&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">
+          Φθηνότερη τιμή
+        </span>
+</a>    </li>
+    <li>
+      <a class="icon filter-option order-option filter-radio" title="Φθηνότερη τελική τιμή" rel="nofollow" data-turbo="true" data-action="click-&gt;sku-page--shops-list--drawer#closeSorting" href="/s/59304245/shops_list?fe=sort.final_price&amp;order_by=final_price&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">
+          Φθηνότερη τελική τιμή
+            <small>(τιμή & μεταφορικά)</small>
+        </span>
+</a>    </li>
+    <li>
+      <a class="icon filter-option order-option filter-radio" title="Γρηγορότερο" rel="nofollow" data-turbo="true" data-action="click-&gt;sku-page--shops-list--drawer#closeSorting" href="/s/59304245/shops_list?fe=sort.delivery&amp;order_by=delivery&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">
+          Γρηγορότερο
+        </span>
+</a>    </li>
+    <li>
+      <a class="icon filter-option order-option filter-radio" title="Κοντινότερο" rel="nofollow" data-turbo="true" data-action="click-&gt;sku-page--shops-list--drawer#closeSorting" href="/s/59304245/shops_list?fe=sort.distance&amp;order_by=distance&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">
+          Κοντινότερο
+        </span>
+</a>    </li>
+</ul>
+
+    </div>
+    <div class="bottom-actions">
+      <button type="button" class="button button-primary"
+              data-action="click->sku-page--shops-list--drawer#closeSorting">
+        17 Καταστήματα
+      </button>
+    </div>
+  </div>
+</div>
+
+    <div id="shops-list-delivery"
+     class="bottom-drawer filter-bottom-drawer shops-list-delivery-drawer"
+     role="dialog" aria-modal="true" aria-hidden="true"
+     aria-labelledby="shops-list-delivery-title"
+     data-action="click->sku-page--shops-list--drawer#closeDeliveryOnBackdrop">
+  <div class="bottom-drawer-content">
+    <div class="bottom-drawer-header">
+      <h2 class="bottom-drawer-title" id="shops-list-delivery-title">Επιλογές παράδοσης</h2>
+      <button type="button" class="bottom-drawer-close icon"
+              aria-label="Κλείσιμο"
+              data-action="click->sku-page--shops-list--drawer#closeDelivery">Κλείσιμο</button>
+    </div>
+    <div class="bottom-drawer-body">
+      <ul>
+    <li>
+      <a class="icon filter-option count-alt filter-radio highlighted" title="Αύριο" rel="nofollow" data-turbo="true" data-filter-key="availability expressDelivery expressDeliverySpeed" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter" href="/s/59304245/shops_list?express_delivery_speed=tomorrow&amp;fe=delivery.tomorrow&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">Αύριο </span>
+        <small>2</small>
+</a>    </li>
+    <li>
+      <a class="icon filter-option count-alt filter-radio" title="έως 8 ημέρες" rel="nofollow" data-turbo="true" data-filter-key="availability expressDelivery expressDeliverySpeed" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter" href="/s/59304245/shops_list?availability=2&amp;fe=delivery.availability_2&amp;sponsored_product_card_ids%5B%5D=276686013">
+        <span class="filter-text">έως 8 ημέρες </span>
+        <small>5</small>
+</a>    </li>
+
+    <li>
+      <a class="icon filter-option count-alt filter-checkbox" title="Παραλαβή από το κατάστημα" rel="nofollow" data-turbo="true" href="/s/59304245/shops_list?fe=delivery.store_pickup.on&amp;sponsored_product_card_ids%5B%5D=276686013&amp;store_pickup=1">
+        <span class="filter-text">Παραλαβή από το κατάστημα </span>
+        <small>2</small>
+</a>    </li>
+</ul>
+
+    </div>
+    <div class="bottom-actions">
+      <button type="button" class="button button-primary"
+              data-action="click->sku-page--shops-list--drawer#closeDelivery">
+        17 Καταστήματα
+      </button>
+    </div>
+  </div>
+</div>
+
+    <div id="shops-list-distance"
+     class="bottom-drawer filter-bottom-drawer shops-list-distance-drawer"
+     role="dialog" aria-modal="true" aria-hidden="true"
+     aria-labelledby="shops-list-distance-title"
+     data-action="click->sku-page--shops-list--drawer#closeDistanceOnBackdrop">
+  <div class="bottom-drawer-content">
+    <div class="bottom-drawer-header">
+      <h2 class="bottom-drawer-title" id="shops-list-distance-title">Απόσταση καταστήματος</h2>
+      <button type="button" class="bottom-drawer-close icon"
+              aria-label="Κλείσιμο"
+              data-action="click->sku-page--shops-list--drawer#closeDistance">Κλείσιμο</button>
+    </div>
+    <div class="bottom-drawer-body">
+        <p class="distance-origin">
+          Από:
+          <button type="button" class="btn-reset" data-type="personalization-settings"
+                  data-action="click->sku-page--shops-list--filters#openPersonalization">
+            <i class="ds-icon icon-ds-pin"></i> <span>Αθήνα</span>
+          </button>
+        </p>
+      
+  <ul>
+      <li>
+          <a class="icon filter-option count-alt filter-radio" title="2 χιλιόμετρα" rel="nofollow" data-turbo="true" data-filter-key="distanceTier" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter click-&gt;sku-page--shops-list--drawer#closeDistance" href="/s/59304245/shops_list?distance=2&amp;fe=distance.2&amp;sponsored_product_card_ids%5B%5D=276686013">
+            <span class="filter-text">2 χιλιόμετρα </span>
+            <small>1</small>
+</a>      </li>
+      <li>
+          <a class="icon filter-option count-alt filter-radio" title="5 χιλιόμετρα" rel="nofollow" data-turbo="true" data-filter-key="distanceTier" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter click-&gt;sku-page--shops-list--drawer#closeDistance" href="/s/59304245/shops_list?distance=5&amp;fe=distance.5&amp;sponsored_product_card_ids%5B%5D=276686013">
+            <span class="filter-text">5 χιλιόμετρα </span>
+            <small>3</small>
+</a>      </li>
+      <li>
+          <a class="icon filter-option count-alt filter-radio" title="10 χιλιόμετρα" rel="nofollow" data-turbo="true" data-filter-key="distanceTier" data-action="click-&gt;sku-page--shops-list--filters#clearStoredFilter click-&gt;sku-page--shops-list--drawer#closeDistance" href="/s/59304245/shops_list?distance=10&amp;fe=distance.10&amp;sponsored_product_card_ids%5B%5D=276686013">
+            <span class="filter-text">10 χιλιόμετρα </span>
+            <small>3</small>
+</a>      </li>
+  </ul>
+
+    </div>
+    <div class="bottom-actions">
+      <button type="button" class="button button-primary"
+              data-action="click->sku-page--shops-list--drawer#closeDistance">
+        17 Καταστήματα
+      </button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+      <section class="sponsored-product-cards-redesigned" data-testid="sponsored-product-cards"
+         data-sku-page--shops-list--drawer-target="impression"
+         data-impression-key="romeo.show_more_metrics.sponsored_product_cards">
+  <div class="saved-cards">
+    <div class="selected-shops-title">
+      <h2 class="prices-shops-title redesigned">
+        Επιλεγμένο κατάστημα
+      </h2>
+    </div>
+    <div
+  class="scroll-list-wrapper"
+  data-controller="horizontal-scrolling"
+  data-horizontal-scrolling-offset-value="100"
+  
+>
+  <ul
+    class="scroll-area featured-product-card-redesigned non-featured-sku featured-product-card-redesigned--single"
+    data-horizontal-scrolling-target="scrollable"
+    
+  >
+    
+        <li id="shop-28235"
+    class="product-card-redesigned featured-merchant-card"
+    data-card-id="276686013"
+    data-shop-id="28235"
+    data-raw-price="370.0"
+    data-price="370,00 €"
+    data-product-url="/products/show/276686013"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="true"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="370.0"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 5G 8GB/128GB Awesome Graphite&quot;,&quot;id&quot;:59304245,&quot;price&quot;:370.0,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+    <div class="shop-highlight-container">
+        <span class="badge badge-weak-neutral shop-highlight">Άμεση αποστολή</span>
+        <span class="shop-promoter">
+            <span class="label-text icon tooltip-parent js-tooltip-handler" data-trigger="toggle" data-type="element" data-theme="light" data-placement="down-right" data-element="#cps_276686013_tooltip">Ad</span>
+
+  <template id="cps_276686013_tooltip">
+    <div data-controller="modal-trigger"
+     data-modal-trigger-modal-outlet="#cps_276686013_modal"
+     class="modal-trigger-container">
+  
+      <div class="ad-info-tooltip"><p>Η διαφήμιση που βλέπεις σχετίζεται με τα προϊόντα που αναζητάς στο Skroutz <br><br> <strong>Mάθε Περισσότερα</strong></p></div>
+
+</div>
+  </template>
+
+<dialog id="cps_276686013_modal"
+        data-controller="modal"
+        data-modal-with-scrollbar-class="modal-with-scrollbar"
+        data-modal-click-away-value="true"
+        data-modal-open-value="false"
+        data-action="keydown.esc->modal#handleEscapeKey"
+        class="modal ad-initiator modal-with-header-divider">
+
+  <div class="modal-inner">
+    <header class="modal-header">
+        <h1 class="modal-title">Πληροφορίες διαφήμισης</h1>
+      <button type="button"
+              class="modal-close"
+              aria-label="Close modal"
+              data-modal-target="closeBtn">
+        <i class="ds-icon icon-clear"></i>
+
+      </button>
+    </header>
+
+      <section class="modal-content" data-modal-target="content">
+        
+  <turbo-frame id="cps_276686013" loading="lazy" src="https://www.skroutz.gr/ads_info/show/cps?id%5B%5D=276686013"></turbo-frame>
+
+      </section>
+
+</div></dialog>
+
+        </span>
+    </div>
+  <div class="product-name" title="Samsung Galaxy A56 5G 8GB/128GB Awesome Graphite">Samsung Galaxy A56 5G 8GB/128GB Awesome Graphite</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">370</span>
+      <span class="decimal-part">00</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Αύριο</strong>
+</div>
+      </div>
+    </div>
+      <span class="ndd offering-subtext"
+            data-controller="sku-page--offerings--ndd-countdown"
+            data-sku-page--offerings--ndd-countdown-time-limit-value="1792580400000"
+            data-sku-page--offerings--ndd-countdown-refresh-at-value="1792580444813"
+            data-sku-page--offerings--ndd-countdown-is-sdd-value="false"></span>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-follow-cookie-link-data-cart-value="{&quot;ecommerce_cart&quot;:{&quot;stm&quot;:&quot;stm:/c/sbm/28235/t/s/59304245/x/sku&quot;}}" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="18" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="276686013" data-requires-size="false" data-requires-assortment="false" data-from="organic_featured_product_card">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="IMShops" loading="lazy" src="//b.scdn.gr/ds/shops/logos/28235/mid_20250724113802_806d229d.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">5,0</span>
+          <span class="reviews">(20)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/28235/IMShops#shop-reviews">
+            <span>5,0 (20 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Βριλήσσια, Ελλάδα</span>
+        </div>
+        <div class="store-pickup">
+          <i class="ds-icon icon-ds-hand-holding-box"></i>
+
+          <span>Δυνατότητα παραλαβής από το κατάστημα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/28235/IMShops/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+
+  </ul>
+
+  <button
+    class="slider-btn prev icon"
+    disabled
+    data-horizontal-scrolling-target="leftButton"
+    data-action="click->horizontal-scrolling#scrollLeft"
+    type="button"
+    aria-label="Previous"
+  ></button>
+  <button
+    class="slider-btn next icon"
+    disabled
+    data-horizontal-scrolling-target="rightButton"
+    data-action="click->horizontal-scrolling#scrollRight"
+    type="button"
+    aria-label="Next"
+  ></button>
+</div>
+  </div>
+  <span class="separator"></span>
+</section>
+
+
+    <h2 class="prices-shops-title redesigned">Όλα τα καταστήματα</h2>
+
+      <ol id="prices"
+    class="sku-list"
+      data-sku-page--shops-list--drawer-target="impression"
+      data-impression-key="romeo.show_more_metrics.organic_product_cards"
+    >
+    <li id="shop-22494"
+    class="product-card-redesigned"
+    data-card-id="258729064"
+    data-shop-id="22494"
+    data-raw-price="365.0"
+    data-price="365,00 €"
+    data-product-url="/products/show/258729064"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="365.0"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 5G Dual SIM (8GB/128GB) Awesome Graphite&quot;,&quot;id&quot;:59304245,&quot;price&quot;:365.0,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 5G Dual SIM (8GB/128GB) Awesome Graphite">Samsung Galaxy A56 5G Dual SIM (8GB/128GB) Awesome Graphite</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">365</span>
+      <span class="decimal-part">00</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Τετ, 04 Νοε - Τρί, 10 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="100" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="258729064" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="iSolve" loading="lazy" src="//a.scdn.gr/ds/shops/logos/22494/mid_20230421151621_f8a5a848.jpeg">
+        </span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Βούλα, Ελλάδα</span>
+        </div>
+        <a class="storefront-link" href="/shop/22494/iSolve/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-24271"
+    class="product-card-redesigned"
+    data-card-id="249000737"
+    data-shop-id="24271"
+    data-raw-price="369.6"
+    data-price="369,60 €"
+    data-product-url="/products/show/249000737"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="369.6"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 5G Dual SIM (8GB/128GB) Awesome Graphite&quot;,&quot;id&quot;:59304245,&quot;price&quot;:369.6,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 5G Dual SIM (8GB/128GB) Awesome Graphite">Samsung Galaxy A56 5G Dual SIM (8GB/128GB) Awesome Graphite</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">369</span>
+      <span class="decimal-part">60</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">έως Παρ, 30 Οκτ</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="78" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="249000737" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="T support" loading="lazy" src="//a.scdn.gr/ds/shops/logos/24271/mid_20230829153143_93967731.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,9</span>
+          <span class="reviews">(31)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/24271/T-support#shop-reviews">
+            <span>4,9 (31 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Ηλιούπολη, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/24271/T-support/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-7"
+    class="product-card-redesigned"
+    data-card-id="248419175"
+    data-shop-id="7"
+    data-raw-price="369.9"
+    data-price="369,90 €"
+    data-product-url="/products/show/248419175"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="369.9"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung SM-A566 Galaxy A56 5G, 8GB/128GB, Dual SIM, NFC, Graphite (EU) (8806095982878)&quot;,&quot;id&quot;:59304245,&quot;price&quot;:369.9,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung SM-A566 Galaxy A56 5G, 8GB/128GB, Dual SIM, NFC, Graphite (EU) (8806095982878)">Samsung SM-A566 Galaxy A56 5G, 8GB/128GB, Dual SIM, NFC, Graphite (EU) (8806095982878)</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">369</span>
+      <span class="decimal-part">90</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Τετ, 04 Νοε - Τρί, 10 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="10" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="248419175" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="MG Manager" loading="lazy" src="//d.scdn.gr/ds/shops/logos/7/mid_20221203115119_a3f2dbab.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,8</span>
+          <span class="reviews">(278)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/7/MG-Manager#shop-reviews">
+            <span>4,8 (278 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Αθήνα, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/7/MG-Manager/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-28235"
+    class="product-card-redesigned"
+    data-card-id="276686013"
+    data-shop-id="28235"
+    data-raw-price="370.0"
+    data-price="370,00 €"
+    data-product-url="/products/show/276686013"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="370.0"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 5G 8GB/128GB Awesome Graphite&quot;,&quot;id&quot;:59304245,&quot;price&quot;:370.0,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 5G 8GB/128GB Awesome Graphite">Samsung Galaxy A56 5G 8GB/128GB Awesome Graphite</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">370</span>
+      <span class="decimal-part">00</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Αύριο</strong>
+</div>
+      </div>
+    </div>
+      <span class="ndd offering-subtext"
+            data-controller="sku-page--offerings--ndd-countdown"
+            data-sku-page--offerings--ndd-countdown-time-limit-value="1792580400000"
+            data-sku-page--offerings--ndd-countdown-refresh-at-value="1792580444813"
+            data-sku-page--offerings--ndd-countdown-is-sdd-value="false"></span>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="18" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="276686013" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="IMShops" loading="lazy" src="//b.scdn.gr/ds/shops/logos/28235/mid_20250724113802_806d229d.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">5,0</span>
+          <span class="reviews">(20)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/28235/IMShops#shop-reviews">
+            <span>5,0 (20 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Βριλήσσια, Ελλάδα</span>
+        </div>
+        <div class="store-pickup">
+          <i class="ds-icon icon-ds-hand-holding-box"></i>
+
+          <span>Δυνατότητα παραλαβής από το κατάστημα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/28235/IMShops/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-1153"
+    class="product-card-redesigned"
+    data-card-id="246259128"
+    data-shop-id="1153"
+    data-raw-price="374.48"
+    data-price="374,48 €"
+    data-product-url="/products/show/246259128"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="374.48"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;SAMSUNG GALAXY A56 5G SM-A566BDS 128GB ROM/8GB RAM AWESOME GRAPHITE EU&quot;,&quot;id&quot;:59304245,&quot;price&quot;:374.48,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="SAMSUNG GALAXY A56 5G SM-A566BDS 128GB ROM/8GB RAM AWESOME GRAPHITE EU">SAMSUNG GALAXY A56 5G SM-A566BDS 128GB ROM/8GB RAM AWESOME GRAPHITE EU</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">374</span>
+      <span class="decimal-part">48</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">έως Παρ, 23 Οκτ</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="100" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="246259128" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="Mobilephones" loading="lazy" src="//c.scdn.gr/ds/shops/logos/1153/mid_20151119143428_88de70de.png">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">5,0</span>
+          <span class="reviews">(6)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/1153/Mobilephones#shop-reviews">
+            <span>5,0 (6 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Σέρρες, Ελλάδα</span>
+        </div>
+        <a class="storefront-link" href="/shop/1153/Mobilephones/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-708"
+    class="product-card-redesigned"
+    data-card-id="247589217"
+    data-shop-id="708"
+    data-raw-price="374.94"
+    data-price="374,94 €"
+    data-product-url="/products/show/247589217"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="374.94"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 A566 5G Dual Sim 8GB RAM 128GB - Graphite&quot;,&quot;id&quot;:59304245,&quot;price&quot;:374.94,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 A566 5G Dual Sim 8GB RAM 128GB - Graphite">Samsung Galaxy A56 A566 5G Dual Sim 8GB RAM 128GB - Graphite</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">374</span>
+      <span class="decimal-part">94</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Πέμ, 29 Οκτ - Τετ, 04 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="5" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="247589217" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="Plus3" loading="lazy" src="//a.scdn.gr/ds/shops/logos/708/mid_ea034011-9804-4b69-bb38-525bd55ff5e7.jpg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,0</span>
+          <span class="reviews">(61)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/708/Plus3#shop-reviews">
+            <span>4,0 (61 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Θεσσαλονίκη, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5 τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/708/Plus3/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-27337"
+    class="product-card-redesigned"
+    data-card-id="270550200"
+    data-shop-id="27337"
+    data-raw-price="375.0"
+    data-price="375,00 €"
+    data-product-url="/products/show/270550200"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="375.0"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 8/128GB - Γκρι&quot;,&quot;id&quot;:59304245,&quot;price&quot;:375.0,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 8/128GB - Γκρι">Samsung Galaxy A56 8/128GB - Γκρι</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">375</span>
+      <span class="decimal-part">00</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">έως Τρί, 27 Οκτ</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="100" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="270550200" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="Recell" loading="lazy" src="//a.scdn.gr/ds/shops/logos/27337/mid_20241213094736_5cdc75ac.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">5,0</span>
+          <span class="reviews">(31)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/27337/Recell#shop-reviews">
+            <span>5,0 (31 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Τρίκαλα, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/27337/Recell/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-26081"
+    class="product-card-redesigned"
+    data-card-id="301016228"
+    data-shop-id="26081"
+    data-raw-price="388.57"
+    data-price="388,57 €"
+    data-product-url="/products/show/301016228"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="388.57"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 Mobile Phone, Exynos 1580 Octa-Core Processor, 6.7\&quot; Super AMOLED Touchscreen, 8GB RAM, 128GB Flash, Triple Camera 50+12+5MP, Wi-Fi, 5G, Dual SIM, Android (Gray)&quot;,&quot;id&quot;:59304245,&quot;price&quot;:388.57,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 Mobile Phone, Exynos 1580 Octa-Core Processor, 6.7&quot; Super AMOLED Touchscreen, 8GB RAM, 128GB Flash, Triple Camera 50+12+5MP, Wi-Fi, 5G, Dual SIM, Android (Gray)">Samsung Galaxy A56 Mobile Phone, Exynos 1580 Octa-Core Processor, 6.7&quot; Super AMOLED Touchscreen, 8GB RAM, 128GB Flash, Triple Camera 50+12+5MP, Wi-Fi, 5G, Dual SIM, Android (Gray)</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">388</span>
+      <span class="decimal-part">57</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Δευ, 02 Νοε - Παρ, 06 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+    <div class="product-card-delivery-origin">
+      <i class="ds-icon icon-ds-globe"></i>
+
+      <span>Αποστέλλεται από Ρουμανία</span>
+    </div>
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="50" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="301016228" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="evomag" loading="lazy" src="//c.scdn.gr/ds/shops/logos/26081/mid_20250424153102_78b74a40.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,7</span>
+          <span class="reviews">(34)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/26081/evomag#shop-reviews">
+            <span>4,7 (34 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Ρουμανία</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/26081/evomag/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-16975"
+    class="product-card-redesigned"
+    data-card-id="311304193"
+    data-shop-id="16975"
+    data-raw-price="391.92"
+    data-price="391,92 €"
+    data-product-url="/products/show/311304193"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="391.92"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 (A566 2025) 5G 128GB (8GB Ram) Dual-Sim Awesome Graphite EU&quot;,&quot;id&quot;:59304245,&quot;price&quot;:391.92,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 (A566 2025) 5G 128GB (8GB Ram) Dual-Sim Awesome Graphite EU">Samsung Galaxy A56 (A566 2025) 5G 128GB (8GB Ram) Dual-Sim Awesome Graphite EU</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">391</span>
+      <span class="decimal-part">92</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Δευ, 26 Οκτ - Δευ, 02 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="100" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="311304193" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="TechMobile" loading="lazy" src="//b.scdn.gr/ds/shops/logos/16975/mid_20220130000847_ac2d44e4.jpeg">
+        </span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Νέα Πέραμος Καβάλας, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/16975/TechMobile/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-24855"
+    class="product-card-redesigned"
+    data-card-id="297592174"
+    data-shop-id="24855"
+    data-raw-price="397.44"
+    data-price="397,44 €"
+    data-product-url="/products/show/297592174"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="397.44"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;SAMSUNG GALAXY A56 5G SM-A566BDS 128GB ROM/8GB RAM AWESOME GRAPHITE EU AWESOME GRAPHITE 128GB 8GB&quot;,&quot;id&quot;:59304245,&quot;price&quot;:397.44,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="SAMSUNG GALAXY A56 5G SM-A566BDS 128GB ROM/8GB RAM AWESOME GRAPHITE EU AWESOME GRAPHITE 128GB 8GB">SAMSUNG GALAXY A56 5G SM-A566BDS 128GB ROM/8GB RAM AWESOME GRAPHITE EU AWESOME GRAPHITE 128GB 8GB</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">397</span>
+      <span class="decimal-part">44</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">έως Δευ, 26 Οκτ</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="100" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="297592174" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="Eleven Mobile" loading="lazy" src="//c.scdn.gr/ds/shops/logos/24855/mid_20231121215502_2a67bdd0.jpeg">
+        </span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Ασπροβάλτα, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/24855/Eleven-Mobile/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-25810"
+    class="product-card-redesigned"
+    data-card-id="284343067"
+    data-shop-id="25810"
+    data-raw-price="407.56"
+    data-price="407,56 €"
+    data-product-url="/products/show/284343067"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="407.56"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 5G Smartphone - 6.7\&quot; - 128GB (Awesome Graphite, Android 15, 8GB)&quot;,&quot;id&quot;:59304245,&quot;price&quot;:407.56,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 5G Smartphone - 6.7&quot; - 128GB (Awesome Graphite, Android 15, 8GB)">Samsung Galaxy A56 5G Smartphone - 6.7&quot; - 128GB (Awesome Graphite, Android 15, 8GB)</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">407</span>
+      <span class="decimal-part">56</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Δευ, 02 Νοε - Παρ, 06 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+    <div class="product-card-delivery-origin">
+      <i class="ds-icon icon-ds-globe"></i>
+
+      <span>Αποστέλλεται από Ρουμανία</span>
+    </div>
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="78" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="284343067" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="ForIT" loading="lazy" src="//d.scdn.gr/ds/shops/logos/25810/mid_20260112142039_746df60b.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,8</span>
+          <span class="reviews">(20)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/25810/ForIT#shop-reviews">
+            <span>4,8 (20 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Ρουμανία</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/25810/ForIT/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-26655"
+    class="product-card-redesigned"
+    data-card-id="245760850"
+    data-shop-id="26655"
+    data-raw-price="412.79"
+    data-price="412,79 €"
+    data-product-url="/products/show/245760850"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="412.79"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Mobile Phone Samsung Galaxy A56, Dual SIM, 8GB RAM, 128GB, 5G, Dark Gray&quot;,&quot;id&quot;:59304245,&quot;price&quot;:412.79,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Mobile Phone Samsung Galaxy A56, Dual SIM, 8GB RAM, 128GB, 5G, Dark Gray">Samsung Mobile Phone Samsung Galaxy A56, Dual SIM, 8GB RAM, 128GB, 5G, Dark Gray</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">412</span>
+      <span class="decimal-part">79</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">έως Τρί, 27 Οκτ</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+    <div class="product-card-delivery-origin">
+      <i class="ds-icon icon-ds-globe"></i>
+
+      <span>Αποστέλλεται από Ρουμανία</span>
+    </div>
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="40" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="245760850" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="Dwyn" loading="lazy" src="//c.scdn.gr/ds/shops/logos/26655/mid_20240805121147_bb4521bf.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,5</span>
+          <span class="reviews">(10)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/26655/Dwyn#shop-reviews">
+            <span>4,5 (10 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Ρουμανία</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/26655/Dwyn/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-2164"
+    class="product-card-redesigned"
+    data-card-id="290907877"
+    data-shop-id="2164"
+    data-raw-price="473.21"
+    data-price="473,21 €"
+    data-product-url="/products/show/290907877"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="473.21"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Smartphone Samsung Galaxy A56 128GB 5G Dual SIM Graphite (A566)&quot;,&quot;id&quot;:59304245,&quot;price&quot;:473.21,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Smartphone Samsung Galaxy A56 128GB 5G Dual SIM Graphite (A566)">Smartphone Samsung Galaxy A56 128GB 5G Dual SIM Graphite (A566)</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">473</span>
+      <span class="decimal-part">21</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Πέμ, 29 Οκτ - Τετ, 04 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="2" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="290907877" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="Techstores" loading="lazy" src="//b.scdn.gr/ds/shops/logos/2164/mid_20220117094128_cde2d5be.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,7</span>
+          <span class="reviews">(99)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/2164/Techstores#shop-reviews">
+            <span>4,7 (99 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="greca-trustmark-info">
+          <div data-controller="modal-trigger"
+     data-modal-trigger-modal-outlet="#greca-trustmark-modal"
+     class="modal-trigger-container">
+  
+            <button type="button" class="btn-reset greca-trustmark-link">
+              <i class="ds-icon icon-trustmark"></i>
+
+              <span>Πιστοποίηση GRECA Trustmark</span>
+            </button>
+
+</div>
+        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Καλλιθέα, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>2 τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/2164/Techstores/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-24590"
+    class="product-card-redesigned"
+    data-card-id="312479697"
+    data-shop-id="24590"
+    data-raw-price="490.9"
+    data-price="490,90 €"
+    data-product-url="/products/show/312479697"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="490.9"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 5G 128GB Awesome Graphite&quot;,&quot;id&quot;:59304245,&quot;price&quot;:490.9,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 5G 128GB Awesome Graphite">Samsung Galaxy A56 5G 128GB Awesome Graphite</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">490</span>
+      <span class="decimal-part">90</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Πέμ, 05 Νοε - Τετ, 11 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">2,50 €</span>
+          <span class="product-card-fee-suffix"> σε Skroutz Point</span>
+          <span class="product-card-fee-subtext">ή 3,50 € μεταφορικά</span>
+      </span>
+    </div>
+
+    <div class="plus-promo-redesigned">
+  <i class="ds-icon icon-ds-skroutz-plus-logo"></i>
+
+  <div class="plus-promo-info">
+    Το θέλεις με <em>Δωρεάν</em> μεταφορικά;
+  </div>
+  <span class="plus-promo-action"
+        data-add-to-cart-source="product_card_bundle"
+        data-action="click->account--plus-promo-modal#openModal">
+    Γίνε μέλος
+  </span>
+</div>
+
+
+    <div class="product-card-delivery-origin">
+      <i class="ds-icon icon-ds-globe"></i>
+
+      <span>Αποστέλλεται από Πολωνία</span>
+    </div>
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="18" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="312479697" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="Ovolt" loading="lazy" src="//a.scdn.gr/ds/shops/logos/24590/mid_20240524123531_745fe3fb.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,7</span>
+          <span class="reviews">(11)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/24590/Ovolt#shop-reviews">
+            <span>4,7 (11 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Πολωνία</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/24590/Ovolt/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-6283"
+    class="product-card-redesigned"
+    data-card-id="260226012"
+    data-shop-id="6283"
+    data-raw-price="519.0"
+    data-price="519,00 €"
+    data-product-url="/products/show/260226012"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="519.0"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Κινητό Samsung Galaxy A56 5G Dual Sim 8GB/128GB, awesome graphite&quot;,&quot;id&quot;:59304245,&quot;price&quot;:519.0,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Κινητό Samsung Galaxy A56 5G Dual Sim 8GB/128GB, awesome graphite">Κινητό Samsung Galaxy A56 5G Dual Sim 8GB/128GB, awesome graphite</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">519</span>
+      <span class="decimal-part">00</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Αύριο</strong>
+</div>
+      </div>
+    </div>
+      <span class="ndd offering-subtext"
+            data-controller="sku-page--offerings--ndd-countdown"
+            data-sku-page--offerings--ndd-countdown-time-limit-value="1792580400000"
+            data-sku-page--offerings--ndd-countdown-refresh-at-value="1792580416708"
+            data-sku-page--offerings--ndd-countdown-is-sdd-value="false"></span>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="1" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="260226012" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="DnTech" loading="lazy" src="//d.scdn.gr/ds/shops/logos/6283/mid_20191108170527_6c28a5d0.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,6</span>
+          <span class="reviews">(23)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/6283/DnTech#shop-reviews">
+            <span>4,6 (23 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Διαβατά, Ελλάδα</span>
+        </div>
+        <div class="store-pickup">
+          <i class="ds-icon icon-ds-hand-holding-box"></i>
+
+          <span>Δυνατότητα παραλαβής από το κατάστημα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>1 τεμάχιο</span>
+        </div>
+        <a class="storefront-link" href="/shop/6283/DnTech/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-3485"
+    class="product-card-redesigned"
+    data-card-id="265458781"
+    data-shop-id="3485"
+    data-raw-price="529.61"
+    data-price="529,61 €"
+    data-product-url="/products/show/265458781"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="529.61"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung SM-A566B Galaxy A56 Dual SIM 5G 8GB RAM 128GB Graphite EU&quot;,&quot;id&quot;:59304245,&quot;price&quot;:529.61,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung SM-A566B Galaxy A56 Dual SIM 5G 8GB RAM 128GB Graphite EU">Samsung SM-A566B Galaxy A56 Dual SIM 5G 8GB RAM 128GB Graphite EU</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">529</span>
+      <span class="decimal-part">61</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Πέμ, 29 Οκτ - Τετ, 04 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="11" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="265458781" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="GrShop" loading="lazy" src="//c.scdn.gr/ds/shops/logos/3485/mid_20250623145122_34d6fc4b.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,6</span>
+          <span class="reviews">(44)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/3485/GrShop#shop-reviews">
+            <span>4,6 (44 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Χαϊδάρι, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/3485/GrShop/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+    <li id="shop-11973"
+    class="product-card-redesigned"
+    data-card-id="281496147"
+    data-shop-id="11973"
+    data-raw-price="730.9"
+    data-price="730,90 €"
+    data-product-url="/products/show/281496147"
+    data-controller="sku-page--shops-list--card"
+    data-sku-page--shops-list--card-sponsored-value="false"
+    data-sku-page--shops-list--card-featured-sku-value="false"
+    data-sku-page--shops-list--card-price-value="730.9"
+      data-sku-page--shops-list--card-tracking-url-value="https://www.skroutz.gr/merchandising/c/sf/x/product_card_add_to_cart_popup"
+    data-sku-page--shops-list--card-gtag-sku-value="{&quot;name&quot;:&quot;Samsung Galaxy A56 5G Smartphone 8GB/128GB Awesome Graphite (SM-A566BZK)&quot;,&quot;id&quot;:59304245,&quot;price&quot;:730.9,&quot;brand&quot;:&quot;Samsung&quot;,&quot;category&quot;:&quot;Κινητά Τηλέφωνα&quot;}">
+  <div class="product-name" title="Samsung Galaxy A56 5G Smartphone 8GB/128GB Awesome Graphite (SM-A566BZK)">Samsung Galaxy A56 5G Smartphone 8GB/128GB Awesome Graphite (SM-A566BZK)</div>
+  <div class="product-price-promo">
+    <div class="price-and-evaluations">
+      
+<div class="price-box">
+
+  <div class="price-and-installments">
+      <div class="final-price">
+    <span class="integer-part">730</span>
+      <span class="decimal-part">90</span>
+    <span class="currency">€</span>
+  </div>
+
+
+  </div>
+
+
+</div>
+
+      
+
+    </div>
+      
+  </div>
+  <div class="product-card-delivery-box">
+
+    <div class="product-card-estimation">
+      <i class="ds-icon icon-ds-truck"></i>
+
+      <div class="delivery-estimation-content">
+          <div class="delivery-estimation-title">            <span class="delivery-estimation-label">
+                Παράδοση
+            </span>
+              <strong class="delivery-estimation-date">Πέμ, 29 Οκτ - Τετ, 04 Νοε</strong>
+</div>
+      </div>
+    </div>
+
+    <div class="product-card-fee with-location">
+      <i class="product-card-fee-icon ds-icon icon-ds-truck-euro"></i>
+      <span class="product-card-fee-text">
+        <span class="product-card-fee-value">Δωρεάν</span>
+          <span class="product-card-fee-suffix"> μεταφορικά</span>
+      </span>
+    </div>
+
+
+</div>
+
+    <div class="cta-box">
+        <div class="cta-box-section marketplace">
+          <div class="add-to-cart-quantity-button tooltip-parent" data-controller="add-to-cart" data-add-to-cart-quantity-value="0" data-add-to-cart-quick-checkout-value="false" data-add-to-cart-sku-max-quantity-value="18" data-action="add_to_cart:success-&gt;sku-page--shops-list--card#onAddToCartSuccess " data-sku-id="59304245" data-product-id="281496147" data-requires-size="false" data-requires-assortment="false" data-from="sku_product_cards">
+
+      <button type="button" class="add-to-cart-btn icon" data-action="mousedown-&amp;gt;sku-page--shops-list--card#trackImpression click-&gt;add-to-cart#addToCart" data-sku-page--shops-list--card-target="addToCart">
+        <div class="loading-icons-container">
+          <svg class="progress" viewBox="0 0 32 32">
+            <circle r="8" cx="16" cy="16" />
+          </svg>
+        </div>
+
+
+        <span class="default icon">
+          
+  <i class="ds-icon icon-ds-cart-plus-filled"></i>
+
+  <span>Προσθήκη στο καλάθι</span>
+
+        </span>
+
+          <i
+            class="decrease quantity-button"
+            data-action="click->add-to-cart#decreaseQuantity:stop"
+            data-add-to-cart-target="decrease"
+          ></i>
+          <span class="quantity-label hidden" data-add-to-cart-target="counter"></span>
+
+          <i class="increase quantity-button" data-action="click-&gt;add-to-cart#increaseQuantity:stop" data-add-to-cart-target="increase"></i>
+</button></div>
+        </div>
+    </div>
+  <div class="merchant-box" data-controller="sku-page--buybox--merchant-box">
+  <div class="merchant-box-top" data-sku-page--buybox--merchant-box-target="trigger">
+    <div class="info logo">
+        <span class="merchant-logo">
+          <img alt="Getters" loading="lazy" src="//b.scdn.gr/ds/shops/logos/11973/mid_20251119110443_215ce116.jpeg">
+        </span>
+        <i class="ds-icon icon-ds-star-filled"></i>
+        <span class="rating">4,6</span>
+          <span class="reviews">(110)</span>
+    </div>
+    <i class="ds-icon icon-ds-chevron-down toggle" data-sku-page--buybox--merchant-box-target="icon"></i>
+
+  </div>
+  <div class="merchant-box-bottom" data-sku-page--buybox--merchant-box-target="expandable">
+    <div class="merchant-box-bottom-content">
+        <div class="rating-info">
+          <i class="ds-icon icon-ds-star"></i>
+
+          <a class="shop-reviews-link" href="/shop/11973/Getters#shop-reviews">
+            <span>4,6 (110 αξιολογήσεις)</span>
+</a>        </div>
+        <div class="location">
+          <i class="ds-icon icon-ds-pin"></i>
+
+          <span>Αχαρνές, Ελλάδα</span>
+        </div>
+        <div class="stock">
+          <i class="ds-icon icon-ds-box"></i>
+
+          <span>5+ τεμάχια</span>
+        </div>
+        <a class="storefront-link" href="/shop/11973/Getters/products.html?from=sku_page">
+          <span>Δες όλα τα προϊόντα του καταστήματος</span>
+          <i class="ds-icon icon-ds-chevron-right"></i>
+
+</a>    </div>
+  </div>
+</div>
+
+</li>
+
+</ol>
+
+  </div>
+</turbo-frame>
