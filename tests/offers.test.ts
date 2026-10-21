@@ -1,9 +1,11 @@
 // @vitest-environment happy-dom
 import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { parseShopsList } from '../lib/offers';
 
-const html = readFileSync(new URL('./fixtures/shops_list_a56.html', import.meta.url), 'utf8');
+const html = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures/shops_list_a56.html'), 'utf8');
 
 describe('parseShopsList', () => {
   const offers = parseShopsList(html);

@@ -1,210 +1,80 @@
-# 🛒 Skroutz Vanced
+# Skroutz Vanced
 
-A powerful Chrome extension that enhances your [Skroutz.gr](https://www.skroutz.gr) shopping experience with price tracking, cart management, and smart filtering.
+Chrome extension for [skroutz.gr](https://www.skroutz.gr). It shows how good a price really is, scans a whole shop or category for the products worth buying, and finds the cheapest way to buy your cart.
 
-![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-green?logo=googlechrome)
-![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+Built with [WXT](https://wxt.dev) (Manifest V3), Svelte 5 and TypeScript.
 
----
+## Features
 
-## ✨ Features
+| Where | What |
+|-------|------|
+| Category, search, brand and shop pages | Two colour bars on every product card. **Αγορά** (shop pages only): this shop's price compared with the cheapest price on Skroutz today. **Ιστορικό**: today's price inside the lowest/highest range of the chosen period, with ticks for the typical (median) and mean price. Click **διάγραμμα** for the price chart. |
+| Same pages | **Τι αξίζει εδώ** button: reads all listing pages (up to a limit), loads the price history of each product and lists them ranked. Filters: max % over the market low, min closeness to the historic low, hide suspicious discounts, sort. |
+| Product page | The same bars above the buy box, plus the chart. |
+| Everywhere | **Ύποπτη έκπτωση** warning: the price went up in the last weeks and then "dropped" back to about its usual level. |
+| Cart | **Φθηνότερο καλάθι**: the cheapest shop for each item, with shipping counted once per shop (so it also finds when buying more items from one shop is cheaper). **Βρες φθηνότερη εναλλακτική**: cheaper products in the same category with a similar title and good reviews. |
+| Popup | Settings: history period, which bars to show, colour threshold, chart on/off, hide sponsored, scan page limit, request concurrency, review thresholds for alternatives, include shops outside the Skroutz cart. |
 
-| Feature | Description |
-|---------|-------------|
-| 📊 **Price History Graphs** | View interactive price history charts for any product using D3.js and Chart.js |
-| 🛒 **Cart Management** | Save and load multiple shopping carts, empty cart with one click |
-| ⚖️ **Shipping Weight Calculator** | Calculate cumulative shipping weights per shop |
-| 🚫 **Sponsored Item Removal** | Automatically hides sponsored/promoted products |
-| 📈 **Smart Sorting** | Sort products by discount percentage from historical low price |
-| 📍 **Nearby Store Filter** | Filter products available at nearby stores |
-| 💾 **Graph Caching** | Caches price data in localStorage for faster loading |
+## Install from source
 
----
-
-## 🏗️ Architecture
-
-```mermaid
-graph TB
-    subgraph Extension["Chrome Extension"]
-        M[manifest.json]
-        
-        subgraph CS["Content Scripts"]
-            CART[cart.js<br/>Cart Management]
-            GRAF[grafima.js<br/>Price Graphs & Sorting]
-            SEARCH[search.js<br/>Hide Sponsored]
-            PROD[product.js<br/>Product Page]
-        end
-        
-        subgraph LIB["Libraries"]
-            D3[D3.js v7]
-            CHART[Chart.js]
-        end
-    end
-    
-    subgraph Storage["Data Storage"]
-        CHROME[(Chrome Storage<br/>Saved Carts)]
-        LOCAL[(localStorage<br/>Graph Cache)]
-    end
-    
-    subgraph Skroutz["Skroutz.gr"]
-        API[JSON APIs]
-        PAGES[Web Pages]
-    end
-    
-    M --> CS
-    GRAF --> D3
-    GRAF --> CHART
-    CART --> CHROME
-    GRAF --> LOCAL
-    CART -.->|fetch| API
-    GRAF -.->|fetch| API
-    CS -.->|inject into| PAGES
+```bash
+npm install
+npm run build          # output: .output/chrome-mv3
 ```
 
----
+Open `chrome://extensions`, enable Developer mode, click **Load unpacked** and select `.output/chrome-mv3`.
 
-## 📁 Project Structure
+For development with hot reload: `npm run dev`.
+
+## Layout
 
 ```
-Skroutz-Vanced/
-├── manifest.json          # Extension manifest (v3)
-├── README.md              # This file
-│
-├── src/
-│   ├── content-scripts/
-│   │   ├── cart.js        # Cart save/load/empty functionality
-│   │   ├── grafima.js     # Price graphs, sorting, filtering
-│   │   ├── search.js      # Hide sponsored items on search
-│   │   └── product.js     # Product page enhancements
-│   │
-│   ├── lib/
-│   │   ├── Chart.js       # Chart.js library
-│   │   └── d3.v7.min.js   # D3.js v7 library
-│   │
-│   └── assets/
-│       └── images/
-│           ├── delete.png
-│           └── deletecart.png
-│
-└── docs/                  # Documentation (optional)
+entrypoints/
+  listing.content.ts   category / search / brand / shop pages
+  product.content.ts   SKU page
+  cart.content.ts      cart page
+  popup/               settings popup
+components/            Svelte UI (mounted in shadow roots, styles isolated from Skroutz)
+lib/                   pure logic + Skroutz data access
+  api.ts               fetch client: concurrency limit, retry/backoff, TTL cache
+  skroutz.ts           endpoints used by the UI (uses browser.storage.local cache)
+  history.ts           price-graph parsing and statistics
+  fakeDiscount.ts      suspicious discount detection
+  listing.ts           listing JSON parsing and URLs
+  offers.ts            per-shop offers from the shops_list drawer
+  optimizer.ts         cheapest cart (exact branch and bound)
+  alternatives.ts      similar cheaper products
+  deals.ts             deal scoring, filters and sorting
+tests/                 Vitest unit tests with recorded Skroutz fixtures
+scripts/live-check.mjs end-to-end smoke test on the real site
 ```
 
----
+## Skroutz endpoints used
 
-## 🚀 Installation
+All requests run in the page (same origin), so they carry the page's cookies.
 
-### From Source (Developer Mode)
+| Endpoint | Use |
+|----------|-----|
+| `/s/{id}/{slug}/price_graph?currency=EUR&shipping_country=GR` | daily lowest price history (any slug works) |
+| `/s/{id}/shops_list` | per-shop offers (HTML) |
+| `{listing}.json?page=N` | category / shop storefront products |
+| `/search.json?keyphrase=…` | answers 410 with a `redirectUrl` to the best category |
+| `/cart.json` | cart lines |
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/Skroutz-Vanced.git
-   ```
+History is cached for 12 hours and offers for 1 hour.
 
-2. **Open Chrome Extensions**
-   - Navigate to `chrome://extensions/`
-   - Enable **Developer mode** (toggle in top-right)
+## Tests
 
-3. **Load the extension**
-   - Click **"Load unpacked"**
-   - Select the `Skroutz-Vanced` folder
-
-4. **Done!** Visit [skroutz.gr](https://www.skroutz.gr) and enjoy the enhanced features.
-
----
-
-## 📖 Usage Guide
-
-### Price Graphs
-- Navigate to any product listing page
-- Price history graphs load automatically
-- Green percentage = great deal (close to historical low)
-- Click the 📊 button to toggle graph visibility
-
-### Cart Management
-On the cart page (`/cart`):
-- 💾 **Save** - Save current cart with a custom name
-- 📂 **Load** - Load a previously saved cart
-- 🗑️ **Empty** - Clear entire cart with one click
-- ⚖️ **Weights** - Calculate shipping weights per shop
-
-### Smart Sorting
-- Click the ↕️ sort button to reorder products
-- Products are sorted by discount from historical low
-- Enable auto-sort in settings for automatic sorting
-
-### Nearby Store Filter
-- Click the 📍 filter button
-- Shows only products available at nearby stores
-
----
-
-## 🛠️ Technology Stack
-
-| Technology | Purpose |
-|------------|---------|
-| **JavaScript ES6+** | Core extension logic |
-| **Chrome Extensions API** | Browser integration |
-| **D3.js v7** | Statistical calculations (mean, median, deviation) |
-| **Chart.js** | Interactive price charts |
-| **Chrome Storage API** | Persistent cart storage |
-| **localStorage** | Graph data caching |
-
----
-
-## 🔌 API Endpoints Used
-
-The extension fetches data from Skroutz's public JSON APIs:
-
-| Endpoint | Purpose |
-|----------|---------|
-| `/cart.json` | Get current cart data |
-| `/cart/add/{sku_id}.json` | Add item to cart |
-| `/cart/remove_line_item/{id}.json` | Remove item from cart |
-| `/s/{sku_id}/price_graph.json` | Get price history data |
-| `/{category}.json` | Get product listings |
-
----
-
-## ⚙️ Settings
-
-Settings are stored in `localStorage` under `vanced-graph-settings`:
-
-```javascript
-{
-  autoLoadGraphs: true,    // Auto-load price graphs
-  autoSortProducts: false, // Auto-sort by discount
-  limit: -10,              // Threshold for "good deal" (green color)
-  autoHideGraphs: false    // Hide graphs by default
-}
+```bash
+npm test               # unit tests
+npm run check          # svelte-check / types
+npm run live-check     # build + real-site smoke test (needs xvfb-run on a headless machine)
 ```
 
----
+## Disclaimer
 
-## 🤝 Contributing
+Not affiliated with Skroutz S.A.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## License
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## ⚠️ Disclaimer
-
-This extension is not affiliated with, endorsed by, or connected to Skroutz S.A. in any way. It is an independent project created to enhance the user experience on the platform.
-
----
-
-<div align="center">
-  Made with ❤️ for smarter shopping
-</div>
+MIT

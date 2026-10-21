@@ -1,1 +1,0 @@
-let a=document.querySelector(".js-prices").getElementsByTagName("ul");a.length>0&&(a[0].style.display="none");

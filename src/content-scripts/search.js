@@ -1,1 +1,0 @@
-function blurSp(){let e=document.querySelectorAll("li span.label-text");if(0==e.length&&(e=document.querySelectorAll("label-text")),e.length>0)for(let l of e){let e=l.parentElement.parentElement.parentElement;e.style.filter="blur(5px)",e.style.opacity="0.1",e.style.display="none"}}blurSp();

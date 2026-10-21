@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createCache, createClient, HttpError } from '../lib/api';
 
 function res(status: number, body: string, headers: Record<string, string> = {}) {
@@ -24,22 +24,41 @@ describe('createClient', () => {
   });
 
   it('retries 429 and 5xx with backoff, then succeeds', async () => {
-    const sleep = vi.fn(async () => {});
-    const fetch = vi
-      .fn()
-      .mockResolvedValueOnce(res(429, ''))
-      .mockResolvedValueOnce(res(503, ''))
-      .mockResolvedValueOnce(res(200, '{"a":2}'));
-    const c = createClient({ fetch, retries: 2, baseDelayMs: 100, sleep });
-    expect(await c.json('/x')).toEqual({ a: 2 });
-    expect(sleep.mock.calls.map((a) => a[0])).toEqual([100, 200]);
+    vi.useFakeTimers({ now: 0 });
+    try {
+      const starts: number[] = [];
+      const replies = [res(429, ''), res(503, ''), res(200, '{"a":2}')];
+      const fetch = vi.fn(async () => {
+        starts.push(Date.now());
+        return replies.shift()!;
+      });
+      const c = createClient({ fetch, retries: 2, baseDelayMs: 100 });
+      const p = c.json('/x');
+      await vi.runAllTimersAsync();
+      expect(await p).toEqual({ a: 2 });
+      // 429: pause cooldownMs (defaults to baseDelayMs); 503: backoff baseDelayMs * 2^1
+      expect(starts).toEqual([0, 100, 300]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('honours Retry-After seconds on 429', async () => {
-    const sleep = vi.fn(async () => {});
-    const fetch = vi.fn().mockResolvedValueOnce(res(429, '', { 'Retry-After': '3' })).mockResolvedValueOnce(res(200, '{}'));
-    await createClient({ fetch, sleep }).json('/x');
-    expect(sleep).toHaveBeenCalledWith(3000);
+    vi.useFakeTimers({ now: 0 });
+    try {
+      const starts: number[] = [];
+      const replies = [res(429, '', { 'Retry-After': '3' }), res(200, '{}')];
+      const fetch = vi.fn(async () => {
+        starts.push(Date.now());
+        return replies.shift()!;
+      });
+      const p = createClient({ fetch }).json('/x');
+      await vi.runAllTimersAsync();
+      await p;
+      expect(starts).toEqual([0, 3000]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('throws HttpError without retrying on 404/410', async () => {
@@ -58,12 +77,67 @@ describe('createClient', () => {
   });
 
   it('sends Accept json for json() and returns raw text for text()', async () => {
-    const fetch = vi.fn(async () => res(200, '<p>hi</p>'));
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => res(200, '<p>hi</p>'));
     const c = createClient({ fetch });
     expect(await c.text('/h')).toBe('<p>hi</p>');
     await c.json('/j').catch(() => {});
-    const init = fetch.mock.calls[1][1] as RequestInit;
+    const init = fetch.mock.calls[1]![1] as RequestInit;
     expect(new Headers(init.headers).get('Accept')).toContain('application/json');
+  });
+});
+
+describe('createClient rate limiting', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ now: 0 });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  async function run<T>(p: Promise<T>): Promise<T> {
+    await vi.runAllTimersAsync();
+    return p;
+  }
+
+  it('spaces request starts by minIntervalMs', async () => {
+    const starts: number[] = [];
+    const fetch = vi.fn(async () => {
+      starts.push(Date.now());
+      return res(200, '{}');
+    });
+    const c = createClient({ fetch, concurrency: 4, minIntervalMs: 1000 });
+    await run(Promise.all([c.json('/a'), c.json('/b'), c.json('/c')]));
+    expect(starts).toEqual([0, 1000, 2000]);
+  });
+
+  it('a 429 pauses every request until Retry-After, and reports it', async () => {
+    const starts: Record<string, number[]> = {};
+    let first = true;
+    const fetch = vi.fn(async (url: string) => {
+      (starts[url] ??= []).push(Date.now());
+      if (url === '/a' && first) {
+        first = false;
+        return res(429, '', { 'Retry-After': '5' });
+      }
+      return res(200, '{}');
+    });
+    const onRateLimited = vi.fn();
+    const c = createClient({ fetch, concurrency: 1, onRateLimited });
+    await run(Promise.all([c.json('/a'), c.json('/b')]));
+    expect(onRateLimited).toHaveBeenCalledWith(5000);
+    expect(starts['/a']![1]).toBeGreaterThanOrEqual(5000);
+    expect(starts['/b']![0]).toBeGreaterThanOrEqual(5000);
+  });
+
+  it('without Retry-After a 429 pauses for cooldownMs, doubling on repeats', async () => {
+    const starts: number[] = [];
+    const fetch = vi.fn(async () => {
+      starts.push(Date.now());
+      return starts.length <= 2 ? res(429, '') : res(200, '{}');
+    });
+    const c = createClient({ fetch, retries: 2, cooldownMs: 10_000 });
+    await run(c.json('/x'));
+    expect(starts).toEqual([0, 10_000, 30_000]);
   });
 });
 
@@ -95,6 +169,24 @@ describe('createCache', () => {
     expect(await cache.getOrLoad('k', load)).toBe(5);
     expect(await cache.getOrLoad('k', load)).toBe(5);
     expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('getOrLoad shares one load between concurrent callers', async () => {
+    const cache = createCache<number>(mem(), 'x', 1000, () => 0);
+    let resolve!: (v: number) => void;
+    const load = vi.fn(() => new Promise<number>((r) => (resolve = r)));
+    const a = cache.getOrLoad('k', load);
+    const b = cache.getOrLoad('k', load);
+    await new Promise((r) => setTimeout(r, 0));
+    resolve(9);
+    expect(await Promise.all([a, b])).toEqual([9, 9]);
+    expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  it('getOrLoad does not cache a failed load', async () => {
+    const cache = createCache<number>(mem(), 'x', 1000, () => 0);
+    await expect(cache.getOrLoad('k', async () => { throw new Error('boom'); })).rejects.toThrow('boom');
+    expect(await cache.getOrLoad('k', async () => 3)).toBe(3);
   });
 
   it('namespaces keys', async () => {
