@@ -59,7 +59,7 @@
         <input type="range" min="1" max="50" step="1" bind:value={s.scanMaxPages} />
       </label>
       <label>Αιτήματα ανά δευτερόλεπτο: <b>{s.requestsPerSecond}</b>
-        <input type="range" min="0.5" max="2" step="0.5" bind:value={s.requestsPerSecond} />
+        <input type="range" min="0.25" max="1" step="0.25" bind:value={s.requestsPerSecond} />
         <small>Πάνω από ~1/δευτ. το Skroutz μπορεί να σε μπλοκάρει προσωρινά.</small>
       </label>
     </fieldset>
