@@ -27,7 +27,8 @@ export default defineContentScript({
       unmount();
       host.remove();
     });
-    settingsItem.watch(async () => (props.settings = await loadSettings()));
+    const unwatch = settingsItem.watch(async () => (props.settings = await loadSettings()));
+    ctx.onInvalidated(unwatch);
     try {
       const pts = await getHistory(Number(m[1]), m[2] ?? '');
       props.price = marketMinNow(pts);

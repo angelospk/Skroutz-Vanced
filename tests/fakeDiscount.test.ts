@@ -26,6 +26,12 @@ describe('detectFakeDiscount', () => {
     expect(detectFakeDiscount(pts)!.suspicious).toBe(false);
   });
 
+  it('does not flag a drop that is still well above the usual price', () => {
+    // usual 100, raised to 200, now 180: a real (if small) drop, not "back to normal"
+    const pts = series(120, (d) => (d >= 99 && d < 119 ? 200 : d === 119 ? 180 : 100));
+    expect(detectFakeDiscount(pts)!.suspicious).toBe(false);
+  });
+
   it('does not flag a stable price', () => {
     const pts = series(120, () => 100);
     expect(detectFakeDiscount(pts)!.suspicious).toBe(false);

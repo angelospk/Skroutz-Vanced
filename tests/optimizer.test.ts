@@ -73,7 +73,24 @@ describe('planCheapestCart', () => {
   });
 
   it('returns an empty plan for an empty cart', () => {
-    expect(planCheapestCart([])).toEqual({ total: 0, itemsTotal: 0, shippingTotal: 0, choice: {}, shopIds: [] });
+    expect(planCheapestCart([])).toEqual({ total: 0, itemsTotal: 0, shippingTotal: 0, choice: {}, shopIds: [], exact: true });
+  });
+
+  it('finds a cheap offer that sits behind many cheaper-priced offers with high shipping', () => {
+    // Eight offers at 10-17 € with 100 € shipping, a ninth at 18 € with free shipping.
+    const offers = [...Array.from({ length: 8 }, (_, i) => offer(i + 1, 10 + i, 100)), offer(9, 18, 0)];
+    const plan = planCheapestCart([line(1, offers)])!;
+    expect(plan.total).toBe(18);
+    expect(plan.exact).toBe(true);
+  });
+
+  it('stops at the node budget and says the plan is not exact', () => {
+    const lines = Array.from({ length: 10 }, (_, i) =>
+      line(i + 1, Array.from({ length: 10 }, (_, s) => offer(s + 1, 10 + ((i + s) % 3), 5))),
+    );
+    const plan = planCheapestCart(lines, { maxNodes: 50 })!;
+    expect(plan.exact).toBe(false);
+    expect(cartTotal(lines, plan.choice).total).toBeCloseTo(plan.total, 6);
   });
 
   it('respects quantity', () => {
@@ -108,7 +125,8 @@ describe('planCheapestCart', () => {
         for (const o of lines[i].offers) pick(i + 1, { ...choice, [lines[i].skuId]: o });
       };
       pick(0, {});
-      const plan = planCheapestCart(lines, { maxOffersPerLine: 100 })!;
+      const plan = planCheapestCart(lines)!;
+      expect(plan.exact).toBe(true);
       expect(plan.total).toBeCloseTo(best, 6);
       expect(cartTotal(lines, plan.choice).total).toBeCloseTo(plan.total, 6);
     }

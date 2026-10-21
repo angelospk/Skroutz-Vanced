@@ -20,11 +20,64 @@ export interface ClientOptions {
   /** Called with the pause length (ms) whenever the server rate-limits us. */
   onRateLimited?: (pauseMs: number) => void;
   now?: () => number;
+  /**
+   * Extra permit taken before every request, e.g. a rate gate shared by all
+   * tabs through the background worker.
+   */
+  permit?: () => Promise<void>;
+}
+
+export interface RequestOptions {
+  /** Non-2xx statuses whose body should be returned instead of thrown. */
+  okStatuses?: number[];
+  /** Abort: nothing more is sent for this request, retries included. */
+  signal?: AbortSignal;
 }
 
 export interface Client {
-  json(url: string): Promise<any>;
-  text(url: string): Promise<string>;
+  json(url: string, opts?: RequestOptions): Promise<any>;
+  text(url: string, opts?: RequestOptions): Promise<string>;
+  /** Change the spacing of request starts; keeps any active 429 pause. */
+  setMinInterval(ms: number): void;
+}
+
+export interface Gate {
+  /** Resolves when a new request may start; reserves that start. */
+  wait(): Promise<void>;
+  /** Block every start for `ms` from now (extends, never shortens, a pause). */
+  pause(ms: number): void;
+  setInterval(ms: number): void;
+}
+
+/** Rate gate: starts are at least `minIntervalMs` apart and wait out pauses. */
+export function createGate(
+  minIntervalMs: number,
+  now: () => number = () => Date.now(),
+  sleep: (ms: number) => Promise<void> = (ms) => new Promise<void>((r) => setTimeout(r, ms)),
+): Gate {
+  let interval = minIntervalMs;
+  let nextStart = 0;
+  let pauseUntil = 0;
+  return {
+    async wait() {
+      for (;;) {
+        const t = now();
+        const at = Math.max(nextStart, pauseUntil);
+        if (at <= t) {
+          nextStart = t + interval;
+          return;
+        }
+        await sleep(at - t);
+      }
+    },
+    pause(ms) {
+      pauseUntil = Math.max(pauseUntil, now() + ms);
+    },
+    setInterval(ms) {
+      interval = ms;
+      nextStart = Math.min(nextStart, now() + ms);
+    },
+  };
 }
 
 export function createClient(opts: ClientOptions = {}): Client {
@@ -54,41 +107,36 @@ export function createClient(opts: ClientOptions = {}): Client {
   };
 
   // Shared by all requests of this client: a 429 pauses everyone.
-  let nextStart = 0;
-  let pauseUntil = 0;
+  const gate = createGate(minIntervalMs, now, sleep);
   let strikes = 0;
-
-  /** Wait until both the rate limit and any 429 pause allow a new request. */
-  async function gate() {
-    for (;;) {
-      const t = now();
-      const at = Math.max(nextStart, pauseUntil);
-      if (at <= t) {
-        nextStart = t + minIntervalMs;
-        return;
-      }
-      await sleep(at - t);
-    }
-  }
 
   function rateLimited(res: Response) {
     const header = res.headers.get('Retry-After');
-    const ra = header === null ? NaN : Number(header);
-    const pause = Number.isFinite(ra) && ra >= 0 ? ra * 1000 : cooldownMs * 2 ** strikes;
+    let pause = NaN;
+    if (header !== null) {
+      const secs = Number(header);
+      pause = Number.isFinite(secs) ? secs * 1000 : Date.parse(header) - now();
+    }
+    if (!Number.isFinite(pause) || pause < 0) pause = cooldownMs * 2 ** strikes;
     strikes++;
-    pauseUntil = Math.max(pauseUntil, now() + pause);
+    gate.pause(pause);
     opts.onRateLimited?.(pause);
   }
 
-  async function request(url: string, headers?: Record<string, string>): Promise<Response> {
+  async function request(url: string, headers: Record<string, string> | undefined, ro: RequestOptions = {}): Promise<Response> {
+    const { okStatuses = [], signal } = ro;
     for (let attempt = 0; ; attempt++) {
       let failure: unknown;
       let backoff = 0;
+      signal?.throwIfAborted();
       await acquire();
       try {
-        await gate();
-        const res = await doFetch(url, { credentials: 'include', headers });
-        if (res.ok) {
+        signal?.throwIfAborted();
+        await gate.wait();
+        if (opts.permit) await opts.permit();
+        signal?.throwIfAborted();
+        const res = await doFetch(url, { credentials: 'include', headers, signal });
+        if (res.ok || okStatuses.includes(res.status)) {
           strikes = 0;
           return res;
         }
@@ -97,6 +145,7 @@ export function createClient(opts: ClientOptions = {}): Client {
         else if (res.status >= 500) backoff = baseDelayMs * 2 ** attempt;
         else throw failure;
       } catch (e) {
+        if (signal?.aborted) throw e;
         if (e instanceof HttpError && e.status !== 429 && e.status < 500) throw e;
         if (!(e instanceof HttpError)) backoff = baseDelayMs * 2 ** attempt;
         failure = e;
@@ -105,12 +154,14 @@ export function createClient(opts: ClientOptions = {}): Client {
       }
       if (attempt >= retries) throw failure;
       if (backoff) await sleep(backoff);
+      signal?.throwIfAborted();
     }
   }
 
   return {
-    json: async (url) => (await request(url, { Accept: 'application/json' })).json(),
-    text: async (url) => (await request(url)).text(),
+    json: async (url, o) => (await request(url, { Accept: 'application/json' }, o)).json(),
+    text: async (url, o) => (await request(url, undefined, o)).text(),
+    setMinInterval: (ms) => gate.setInterval(ms),
   };
 }
 

@@ -26,7 +26,8 @@ export default defineContentScript({
     document.body.append(host);
     const props = reactive({ settings, nameOf });
     const unmount = mountShadow(host, CartPanel, props);
-    settingsItem.watch(async () => (props.settings = await loadSettings()));
+    const unwatch = settingsItem.watch(async () => (props.settings = await loadSettings()));
+    ctx.onInvalidated(unwatch);
     ctx.onInvalidated(() => {
       unmount();
       host.remove();

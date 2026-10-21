@@ -29,6 +29,7 @@ export function detectFakeDiscount(points: PricePoint[]): FakeDiscountResult | n
   const current = last.value;
   const peak = recent.length ? Math.max(...recent.map((p) => p.value)) : current;
   const discountPct = peak > 0 ? (peak - current) / peak : 0;
-  const suspicious = discountPct >= 0.08 && peak >= baseline * 1.08 && current >= baseline * 0.98;
+  const suspicious =
+    discountPct >= 0.08 && peak >= baseline * 1.08 && current >= baseline * 0.98 && current <= baseline * 1.05;
   return { suspicious, peak, baseline, discountPct };
 }

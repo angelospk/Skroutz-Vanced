@@ -74,4 +74,6 @@ export interface CartPlan {
   /** skuId -> chosen offer */
   choice: Record<number, Offer>;
   shopIds: number[];
+  /** False when the search hit its node budget; the plan is then the best one found. */
+  exact: boolean;
 }

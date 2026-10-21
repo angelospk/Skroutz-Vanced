@@ -5,6 +5,7 @@ import { createCache, createClient } from './api';
 import { historyStats, mergedSeries, parsePriceGraph } from './history';
 import { listingJsonUrl, parseListing, priceGraphUrl, shopsListUrl } from './listing';
 import { parseShopsList } from './offers';
+import { intervalFor, type RateMessage } from './rate';
 import { PERIOD_DAYS } from './settings';
 import type { HistoryStats, ListingPage, Offer, Period, PricePoint } from './types';
 
@@ -29,35 +30,47 @@ export function onRateLimited(fn: RateListener): () => void {
   return () => rateListeners.delete(fn);
 }
 
-function makeClient(requestsPerSecond: number) {
-  const rps = Math.max(0.2, Math.min(4, requestsPerSecond));
-  return createClient({
-    concurrency: 2,
-    minIntervalMs: 1000 / rps,
-    retries: 2,
-    cooldownMs: 30_000,
-    onRateLimited: (ms) => rateListeners.forEach((fn) => fn(ms)),
-  });
-}
+const send = (msg: RateMessage) => browser.runtime.sendMessage(msg);
 
-let client = makeClient(1);
-let currentRate = 1;
+// Every request of this tab is spaced locally and also takes a permit from the
+// background worker, which spaces requests across all tabs. If the worker does
+// not answer, the local spacing still applies.
+const client = createClient({
+  concurrency: 2,
+  minIntervalMs: intervalFor(1),
+  retries: 2,
+  cooldownMs: 30_000,
+  permit: () => send({ type: 'sv:permit' }).then(
+    () => undefined,
+    () => undefined,
+  ),
+  onRateLimited: (ms) => {
+    void send({ type: 'sv:pause', ms }).catch(() => undefined);
+    rateListeners.forEach((fn) => fn(ms));
+  },
+});
 
-/** One client per tab: every request of the tab shares its rate limit. */
 export function setRequestRate(requestsPerSecond: number) {
-  if (requestsPerSecond === currentRate) return;
-  currentRate = requestsPerSecond;
-  client = makeClient(requestsPerSecond);
+  client.setMinInterval(intervalFor(requestsPerSecond));
 }
 
 const historyCache = createCache<PricePoint[]>(store, 'h', HISTORY_TTL);
 const offersCache = createCache<Offer[]>(store, 'o', OFFERS_TTL);
 
 /** Daily lowest market price of a SKU, all periods merged, oldest first. */
-export function getHistory(skuId: number, slug: string): Promise<PricePoint[]> {
-  return historyCache.getOrLoad(String(skuId), async () =>
-    mergedSeries(parsePriceGraph(await client.json(priceGraphUrl(skuId, slug)))),
-  );
+export async function getHistory(skuId: number, slug: string, signal?: AbortSignal): Promise<PricePoint[]> {
+  // Concurrent callers share one load. If another caller aborted that load,
+  // a caller that did not abort loads again instead of failing.
+  for (;;) {
+    try {
+      return await historyCache.getOrLoad(String(skuId), async () =>
+        mergedSeries(parsePriceGraph(await client.json(priceGraphUrl(skuId, slug), { signal }))),
+      );
+    } catch (e) {
+      const aborted = e instanceof DOMException && e.name === 'AbortError';
+      if (!aborted || signal?.aborted) throw e;
+    }
+  }
 }
 
 /** Stats over the last `period` of the series (counted back from its newest point). */
@@ -76,8 +89,8 @@ export function getOffers(skuId: number): Promise<Offer[]> {
   return offersCache.getOrLoad(String(skuId), async () => parseShopsList(await client.text(shopsListUrl(skuId))));
 }
 
-export async function getListingPage(pageUrl: string, page: number): Promise<ListingPage> {
-  return parseListing(await client.json(listingJsonUrl(pageUrl, page)));
+export async function getListingPage(pageUrl: string, page: number, signal?: AbortSignal): Promise<ListingPage> {
+  return parseListing(await client.json(listingJsonUrl(pageUrl, page), { signal }));
 }
 
 /**
@@ -85,21 +98,14 @@ export async function getListingPage(pageUrl: string, page: number): Promise<Lis
  * to the best category; follow it and return that category's first page.
  */
 export async function searchListing(keyphrase: string): Promise<{ page: ListingPage; url: string } | null> {
-  const res = await fetch(`/search.json?keyphrase=${encodeURIComponent(keyphrase)}`, {
-    headers: { Accept: 'application/json' },
-    credentials: 'include',
-  });
-  let body: { redirectUrl?: string; skus?: unknown } | null = null;
-  try {
-    body = await res.json();
-  } catch {
-    return null;
-  }
+  const body = (await client.json(`/search.json?keyphrase=${encodeURIComponent(keyphrase)}`, {
+    okStatuses: [410],
+  })) as { redirectUrl?: string; skus?: unknown } | null;
   if (body?.redirectUrl) {
     const url = new URL(body.redirectUrl, location.origin).href;
     return { page: await getListingPage(url, 1), url };
   }
-  if (body?.skus) return { page: parseListing(body), url: location.origin + '/search.html?keyphrase=' + keyphrase };
+  if (body?.skus) return { page: parseListing(body), url: `${location.origin}/search?keyphrase=${encodeURIComponent(keyphrase)}` };
   return null;
 }
 
@@ -119,20 +125,27 @@ export async function getCartItems(): Promise<CartItemRef[]> {
     .map(([lineId, l]) => ({ lineId, skuId: l.sku_id, productId: l.product_id, quantity: l.quantity }));
 }
 
-/** Drop expired cache entries; runs at most once a day. */
+const MAX_HISTORY_ENTRIES = 4000;
+
+/** Drop expired cache entries and cap the history cache; runs at most once an hour. */
 export async function purgeCache(now = Date.now()) {
   const last = (await store.get('purgedAt')) as number | null;
-  if (last && now - last < 24 * HOUR) return;
-  const all = await browser.storage.local.get(null);
-  const stale = Object.entries(all)
-    .filter(([k, v]) => {
-      const t = (v as { t?: number } | null)?.t;
-      if (typeof t !== 'number') return false;
-      if (k.startsWith('h:')) return now - t > HISTORY_TTL;
-      if (k.startsWith('o:')) return now - t > OFFERS_TTL;
-      return false;
-    })
-    .map(([k]) => k);
-  if (stale.length) await browser.storage.local.remove(stale);
+  if (last && now - last < HOUR) return;
   await store.set('purgedAt', now);
+  const all = await browser.storage.local.get(null);
+  const stale: string[] = [];
+  const history: [string, number][] = [];
+  for (const [k, v] of Object.entries(all)) {
+    const t = (v as { t?: number } | null)?.t;
+    if (typeof t !== 'number') continue;
+    if (k.startsWith('h:')) {
+      if (now - t > HISTORY_TTL) stale.push(k);
+      else history.push([k, t]);
+    } else if (k.startsWith('o:') && now - t > OFFERS_TTL) stale.push(k);
+  }
+  if (history.length > MAX_HISTORY_ENTRIES) {
+    history.sort((a, b) => a[1] - b[1]);
+    stale.push(...history.slice(0, history.length - MAX_HISTORY_ENTRIES).map(([k]) => k));
+  }
+  if (stale.length) await browser.storage.local.remove(stale);
 }

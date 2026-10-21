@@ -16,6 +16,12 @@
   let open = $state(false);
   let scanning = $state(false);
   let stopRequested = false;
+  let abort: AbortController | null = null;
+
+  function stop() {
+    stopRequested = true;
+    abort?.abort();
+  }
   let rows = $state<DealRow[]>([]);
   const series = new Map<number, PricePoint[]>();
   let progress = $state({ page: 0, pages: 0, done: 0, total: 0, errors: 0 });
@@ -25,7 +31,7 @@
   onDestroy(
     onRateLimited((ms) => {
       if (!scanning) return;
-      stopRequested = true;
+      stop();
       throttled = `Το Skroutz ζήτησε να κόψουμε ταχύτητα. Η σάρωση σταμάτησε· δοκίμασε ξανά σε ${Math.ceil(ms / 1000)}″ ή μείωσε τα αιτήματα/δευτ. στις ρυθμίσεις.`;
     }),
   );
@@ -39,8 +45,12 @@
   let sort = $state<'history' | 'market' | 'price'>(untrack(() => (storefront ? 'market' : 'history')));
   let limit = $state(60);
 
+  // Stats follow the current period setting, not the one at scan time.
+  const current = $derived(
+    rows.map((r) => ({ ...r, stats: statsFor(series.get(r.item.skuId) ?? [], settings.period) })),
+  );
   const shown = $derived(
-    filterDeals(rows, {
+    filterDeals(current, {
       maxMarketGapPct: storefront && maxGap < 50 ? maxGap / 100 : undefined,
       minHistoryCloseness: minClose > 0 ? minClose / 100 : undefined,
       hideFake,
@@ -52,6 +62,8 @@
     if (scanning) return;
     scanning = true;
     stopRequested = false;
+    abort = new AbortController();
+    const signal = abort.signal;
     throttled = '';
     rows = [];
     series.clear();
@@ -60,10 +72,10 @@
       // 1. Listing pages, one after another.
       const items: ListingItem[] = [];
       const seen = new Set<number>();
-      const first = await getListingPage(pageUrl, 1);
+      const first = await getListingPage(pageUrl, 1, signal);
       progress.pages = Math.max(1, Math.min(settings.scanMaxPages, first.totalPages || 1));
       for (let p = 1; p <= progress.pages && !stopRequested; p++) {
-        const page = p === 1 ? first : await getListingPage(pageUrl, p).catch(() => null);
+        const page = p === 1 ? first : await getListingPage(pageUrl, p, signal).catch(() => null);
         progress.page = p;
         if (!page) {
           progress.errors++;
@@ -82,7 +94,7 @@
         while (!stopRequested && next < items.length) {
           const item = items[next++];
           try {
-            const pts = await getHistory(item.skuId, item.slug);
+            const pts = await getHistory(item.skuId, item.slug, signal);
             series.set(item.skuId, pts);
             rows.push({
               item,
@@ -123,7 +135,7 @@
 
     <div class="actions">
       {#if scanning}
-        <button type="button" onclick={() => (stopRequested = true)}>Διακοπή</button>
+        <button type="button" onclick={stop}>Διακοπή</button>
         <span class="muted">σελίδα {progress.page}/{progress.pages} · {progress.done}/{progress.total} προϊόντα</span>
       {:else}
         <button type="button" class="primary" onclick={scan}>{rows.length ? 'Νέα σάρωση' : 'Σάρωση'}</button>

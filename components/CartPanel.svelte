@@ -34,16 +34,19 @@
           return { ref, name: nameOf(ref.skuId), offers, current: offers.find((o) => o.productId === ref.productId) ?? null };
         }),
       );
-      const lines: CartLine[] = rows.map((r) => ({
-        skuId: r.ref.skuId,
-        quantity: r.ref.quantity,
-        shopId: r.current?.shopId ?? null,
-        offers: r.offers,
-      }));
+      // Current total: one entry per cart line (the same SKU may sit in two lines, from two shops).
       if (rows.length && rows.every((r) => r.current)) {
-        now = cartTotal(lines, Object.fromEntries(rows.map((r) => [r.ref.skuId, r.current!])));
+        const perLine: CartLine[] = rows.map((r, i) => ({ skuId: i, quantity: r.ref.quantity, shopId: r.current!.shopId, offers: [r.current!] }));
+        now = cartTotal(perLine, Object.fromEntries(rows.map((r, i) => [i, r.current!])));
       }
-      plan = planCheapestCart(lines, { marketplaceOnly: !settings.includeOffsite });
+      // Plan: lines of the same SKU merge; the cheapest plan buys them from one offer anyway.
+      const bySku = new Map<number, CartLine>();
+      for (const r of rows) {
+        const prev = bySku.get(r.ref.skuId);
+        if (prev) prev.quantity += r.ref.quantity;
+        else bySku.set(r.ref.skuId, { skuId: r.ref.skuId, quantity: r.ref.quantity, shopId: r.current?.shopId ?? null, offers: r.offers });
+      }
+      plan = planCheapestCart([...bySku.values()], { marketplaceOnly: !settings.includeOffsite });
       if (!plan && rows.length) error = 'Κάποιο προϊόν δεν έχει διαθέσιμη προσφορά για το καλάθι.';
     } catch (e) {
       error = 'Δεν φόρτωσε το καλάθι: ' + String(e);
@@ -108,12 +111,12 @@
       <div class="summary">
         <div>Τώρα: <b>{now ? fmtEuro(now.total) : '–'}</b></div>
         <div>Φθηνότερος συνδυασμός: <b>{fmtEuro(plan.total)}</b>
-          <span class="muted">({fmtEuro(plan.itemsTotal)} + {fmtEuro(plan.shippingTotal)} μεταφορικά, {plan.shopIds.length} {plan.shopIds.length === 1 ? 'κατάστημα' : 'καταστήματα'})</span>
+          <span class="muted">({fmtEuro(plan.itemsTotal)} + {fmtEuro(plan.shippingTotal)} μεταφορικά, {plan.shopIds.length} {plan.shopIds.length === 1 ? 'κατάστημα' : 'καταστήματα'}){#if !plan.exact} · προσεγγιστικό{/if}</span>
         </div>
         {#if now}
           {#if now.total - plan.total > 0.009}
             <div class="save">Κερδίζεις {fmtEuro(now.total - plan.total)}</div>
-          {:else}
+          {:else if plan.exact}
             <div class="ok">Το καλάθι σου είναι ήδη το φθηνότερο.</div>
           {/if}
         {/if}

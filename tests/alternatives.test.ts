@@ -70,6 +70,20 @@ describe('rankAlternatives', () => {
     expect(r[1].similarity).toBeGreaterThan(0.3);
   });
 
+  it('requires the key specs of the target (power, storage, battery, refresh rate)', () => {
+    const cands = [
+      item(2, 'Samsung USB-C to USB-C cable 25W 1.8m Black', 2.5), // 25W != 100W
+      item(3, 'Ugreen USB-C to USB-C cable 100W 1m', 7.2), // same power, other length: ok
+    ];
+    expect(rankAlternatives(target, cands).map((x) => x.item.skuId)).toEqual([3]);
+    const phone = item(20, 'Xiaomi Redmi Note 14 (8GB/256GB) Black', 250, { categoryId: 40 });
+    const phones = [
+      item(21, 'Xiaomi Redmi Note 14 (8GB/128GB) Blue', 200, { categoryId: 40 }),
+      item(22, 'Xiaomi Redmi Note 14 (8GB/256GB) Blue', 230, { categoryId: 40 }),
+    ];
+    expect(rankAlternatives(phone, phones).map((x) => x.item.skuId)).toEqual([22]);
+  });
+
   it('honours custom thresholds and can exclude sponsored items', () => {
     const cands = [item(5, 'Cheap USB-C to USB-C cable 100W', 3, { reviewScore: 2.1 }), item(10, 'Sp USB-C to USB-C cable 100W', 6, { sponsored: true })];
     const r = rankAlternatives(target, cands, { minReviewScore: 0, minReviews: 0, includeSponsored: false });

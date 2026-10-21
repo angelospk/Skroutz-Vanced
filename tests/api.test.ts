@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createCache, createClient, HttpError } from '../lib/api';
+import { createCache, createClient, createGate, HttpError } from '../lib/api';
 
 function res(status: number, body: string, headers: Record<string, string> = {}) {
   return new Response(body, { status, headers });
@@ -69,6 +69,37 @@ describe('createClient', () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
+  it('an aborted signal sends nothing and rejects', async () => {
+    const fetch = vi.fn(async () => res(200, '{}'));
+    const ac = new AbortController();
+    ac.abort();
+    await expect(createClient({ fetch }).json('/x', { signal: ac.signal })).rejects.toThrow();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('aborting during a 429 pause cancels the retry', async () => {
+    vi.useFakeTimers({ now: 0 });
+    try {
+      const fetch = vi.fn(async () => res(429, '', { 'Retry-After': '30' }));
+      const ac = new AbortController();
+      const c = createClient({ fetch, retries: 3, onRateLimited: () => ac.abort() });
+      const p = c.json('/x', { signal: ac.signal });
+      const check = expect(p).rejects.toThrow();
+      await vi.runAllTimersAsync();
+      await check;
+      expect(fetch).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('json() can accept extra statuses (e.g. 410 with a redirect body)', async () => {
+    const fetch = vi.fn(async () => res(410, '{"redirectUrl":"/c/1/x.html"}'));
+    const c = createClient({ fetch });
+    expect(await c.json('/search.json', { okStatuses: [410] })).toEqual({ redirectUrl: '/c/1/x.html' });
+    await expect(c.json('/search.json')).rejects.toMatchObject({ status: 410 });
+  });
+
   it('gives up after `retries` and throws the last error', async () => {
     const fetch = vi.fn(async () => res(500, ''));
     const c = createClient({ fetch, retries: 2, sleep: async () => {} });
@@ -127,6 +158,30 @@ describe('createClient rate limiting', () => {
     expect(onRateLimited).toHaveBeenCalledWith(5000);
     expect(starts['/a']![1]).toBeGreaterThanOrEqual(5000);
     expect(starts['/b']![0]).toBeGreaterThanOrEqual(5000);
+  });
+
+  it('reads Retry-After as an HTTP date', async () => {
+    const starts: number[] = [];
+    const replies = [res(429, '', { 'Retry-After': new Date(7000).toUTCString() }), res(200, '{}')];
+    const fetch = vi.fn(async () => {
+      starts.push(Date.now());
+      return replies.shift()!;
+    });
+    await run(createClient({ fetch }).json('/x'));
+    expect(starts).toEqual([0, 7000]);
+  });
+
+  it('uses the shared permit before every request', async () => {
+    const order: string[] = [];
+    const permit = vi.fn(async () => {
+      order.push('permit');
+    });
+    const fetch = vi.fn(async () => {
+      order.push('fetch');
+      return res(200, '{}');
+    });
+    await run(createClient({ fetch, permit }).json('/x'));
+    expect(order).toEqual(['permit', 'fetch']);
   });
 
   it('without Retry-After a 429 pauses for cooldownMs, doubling on repeats', async () => {
@@ -193,5 +248,39 @@ describe('createCache', () => {
     const store = mem();
     await createCache<number>(store, 'ns', 1000, () => 0).set('k', 1);
     expect([...store.m.keys()]).toEqual(['ns:k']);
+  });
+});
+
+describe('createGate', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ now: 0 });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('spaces permits and honours pauses from any caller', async () => {
+    const gate = createGate(1000);
+    const at: number[] = [];
+    const take = () => gate.wait().then(() => at.push(Date.now()));
+    const all = Promise.all([take(), take()]);
+    await vi.runAllTimersAsync();
+    await all;
+    gate.pause(5000); // now = 1000 -> paused until 6000
+    const third = take();
+    await vi.runAllTimersAsync();
+    await third;
+    expect(at).toEqual([0, 1000, 6000]);
+  });
+
+  it('setInterval changes spacing without dropping a pause', async () => {
+    const gate = createGate(1000);
+    gate.pause(3000);
+    gate.setInterval(200);
+    const at: number[] = [];
+    const all = Promise.all([gate.wait(), gate.wait()].map((p) => p.then(() => at.push(Date.now()))));
+    await vi.runAllTimersAsync();
+    await all;
+    expect(at).toEqual([3000, 3200]);
   });
 });

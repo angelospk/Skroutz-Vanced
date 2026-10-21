@@ -25,8 +25,8 @@ export default defineContentScript({
     setRequestRate(settings.requestsPerSecond);
     void purgeCache();
     const storefront = location.pathname.startsWith('/shop/');
-    const unmounts = new Map<Element, () => void>();
-    const cardProps: { settings: Settings }[] = [];
+    // Per decorated card: its unmount function and reactive props.
+    const cards = new Map<Element, { unmount: () => void; host: HTMLElement; props: { settings: Settings } }>();
 
     const isSponsored = (li: Element) => !!li.querySelector('a[href*="sponsored="], a[href*="from=featured"]');
 
@@ -36,7 +36,7 @@ export default defineContentScript({
 
     function decorate(li: HTMLElement) {
       applySponsored(li);
-      if (unmounts.has(li) || li.style.display === 'none') return;
+      if (cards.has(li) || li.style.display === 'none') return;
       const skuId = Number(li.dataset.skuid);
       const link = li.querySelector<HTMLAnchorElement>('a.js-sku-link[href*="/s/"]');
       const slug = link?.pathname.match(/^\/s\/\d+\/(.+)\.html$/)?.[1] ?? '';
@@ -47,8 +47,7 @@ export default defineContentScript({
       host.style.display = 'block';
       anchor.after(host);
       const props = reactive({ price, points: null as PricePoint[] | null, settings, showMarket: storefront });
-      cardProps.push(props);
-      unmounts.set(li, mountShadow(host, PriceBars, props));
+      cards.set(li, { unmount: mountShadow(host, PriceBars, props), host, props });
       getHistory(skuId, slug)
         .then((pts) => (props.points = pts))
         .catch(() => (props.points = []));
@@ -74,13 +73,28 @@ export default defineContentScript({
         io.observe(li);
       });
     }
+    /** Release cards that Skroutz removed from the page (filters, infinite scroll). */
+    function sweep() {
+      for (const [li, card] of cards) {
+        if (li.isConnected) continue;
+        // The node may come back later (e.g. re-sorting): forget it fully so it is decorated again.
+        card.unmount();
+        card.host.remove();
+        cards.delete(li);
+        seen.delete(li);
+      }
+    }
     scan();
-    const mo = new MutationObserver(() => scan());
+    const mo = new MutationObserver(() => {
+      scan();
+      sweep();
+    });
     mo.observe(document.body, { childList: true, subtree: true });
     ctx.onInvalidated(() => {
       mo.disconnect();
       io.disconnect();
-      unmounts.forEach((u) => u());
+      cards.forEach((c) => c.unmount());
+      cards.clear();
     });
 
     const fab = document.createElement('sv-deals');
@@ -92,12 +106,15 @@ export default defineContentScript({
       fab.remove();
     });
 
-    settingsItem.watch(async () => {
+    ctx.setInterval(() => void purgeCache(), 3600_000);
+
+    const unwatch = settingsItem.watch(async () => {
       settings = await loadSettings();
       setRequestRate(settings.requestsPerSecond);
       overlayProps.settings = settings;
-      cardProps.forEach((p) => (p.settings = settings));
+      cards.forEach((c) => (c.props.settings = settings));
       document.querySelectorAll<HTMLElement>(CARD).forEach(applySponsored);
     });
+    ctx.onInvalidated(unwatch);
   },
 });

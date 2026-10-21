@@ -15,6 +15,14 @@ export function normalizeTitle(s: string): string[] {
     .filter((t) => t.length > 0);
 }
 
+/** Tokens that define what the product is: power, storage, battery, refresh rate, camera. */
+const SPEC = /^[0-9]+(?:\.[0-9]+)?(?:w|gb|tb|mah|hz|mp)$/;
+
+/** Key spec tokens of a title, e.g. "100w", "256gb". */
+export function specTokens(title: string): string[] {
+  return normalizeTitle(title).filter((t) => SPEC.test(t));
+}
+
 /** Jaccard similarity of the two titles' word sets. */
 export function titleSimilarity(a: string, b: string): number {
   const sa = new Set(normalizeTitle(a));
@@ -55,6 +63,7 @@ export function rankAlternatives(
   if (target.price === null) return [];
   const targetPrice = target.price;
   const checkReviews = minReviewScore > 0 || minReviews > 0;
+  const targetSpecs = specTokens(target.name);
   const out: Alternative[] = [];
   for (const item of candidates) {
     if (item.skuId === target.skuId) continue;
@@ -64,6 +73,9 @@ export function rankAlternatives(
     if (checkReviews) {
       if (item.reviewScore === null || item.reviewScore < minReviewScore || item.reviewsCount < minReviews) continue;
     }
+    // An alternative must keep every key spec of the target (a 25W cable does not replace a 100W one).
+    const specs = new Set(specTokens(item.name));
+    if (!targetSpecs.every((s) => specs.has(s))) continue;
     const similarity = titleSimilarity(target.name, item.name);
     if (similarity < minSimilarity) continue;
     out.push({ item, similarity, saving: targetPrice - item.price });
